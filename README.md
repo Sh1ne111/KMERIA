@@ -7,7 +7,7 @@
 
 ## Overview
 
- This repository contains a implementation of a kmer-based method for Genome-Wide Assocation Study(GWAS) in complex polyploid organisms (e.g., sugarcane, potato, sweetpotato; the method is also applicable to diploid species). The method leverages k-mer abundance and statistical models to identify association loci between genetic variants and phenotypic traits.
+This repository contains an implementation of a k-mer-based method for Genome-Wide Association Studies (GWAS) in complex polyploid organisms (e.g., sugarcane, potato, sweetpotato, alfalfa，...). The approach is equally applicable to diploid species. By leveraging k-mer abundance profiles and statistical modeling, the method identifies associations between genetic variants and phenotypic traits.
 
 ## Features
 
