@@ -82,7 +82,7 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --queue hebhcnormal01
    ```
 
-#### 1. kmeria overview
+#### 1. kmeria overview (detailed steps)
 
    ```bash
   #--------------------------------------------------------------------------------------#
