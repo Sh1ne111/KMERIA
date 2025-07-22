@@ -137,8 +137,8 @@ Command:
 #### 2.Input Data
 Prepare your input data as follows:
 
-- *Genomic sequences: population resequencing data [format: fastq/fastq.gz].**
-- *Phenotypic data: tsv format with no headers for traits.**
+Genomic sequences: population resequencing data [format: fastq/fastq.gz].
+Phenotypic data: tsv format with no headers for traits.
 
 
  #### 3. Step by step usage
