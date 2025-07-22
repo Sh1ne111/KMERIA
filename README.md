@@ -71,9 +71,9 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --min-abund 5 \
   --max-abund 1000 \
   --batch_size 2 \
-  --use-kmc \
-  --use-kctm2 \      # optional
-  --kmc-memory 32 \  #  optional
+  --use-kmc2 \
+  --use-kctm \      # optional
+  --kmc-memory 32 \
   --ploidy 4 \
   --depth-file /path/to/sample_depths.txt \
   --pheno /path/to/phenotypes.txt \
