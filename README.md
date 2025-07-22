@@ -72,7 +72,7 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --max-abund 1000 \
   --batch_size 2 \
   --use-kmc2 \
-  --use-kctm \      # optional
+ # --use-kctm \      # optional
   --kmc-memory 32 \
   --ploidy 4 \
   --depth-file /path/to/sample_depths.txt \
