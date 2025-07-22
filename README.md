@@ -16,7 +16,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 
 - **Independent of Reference Genomes:** KMERIA do not rely on a reference genome in steps to identify genotypes, making them suitable for organisms with complex and variable genomic architectures, such as auto-polyploids.
 
-- **Improved Additive effect Estimation:** The analysis of k-mer copy number can provide more accurate estimates of additive effects in auto-polyploid species, allowing for better interpretation of genotype-phenotype relationships.
+- **Improved Additive effect Estimation:** The analysis of k-mer copy number can provide more efficient estimates of additive effects in auto-polyploid species, allowing for better interpretation of genotype-phenotype relationships.
 
 - **Facilitated Genotype Identification:** KMERIA reduce the complexity of identifying genotypes in polyploids, facilitating faster and more efficient association analyses.
 
