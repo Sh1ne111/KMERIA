@@ -190,7 +190,6 @@ To accelerate the subsequent construction of the k-mer matrix and save storage s
 pigz -p 4 sample1_k31.kmc.tsv
 ...
 pigz -p 4 sampleN_k31.kmc.tsv
-
 ```
 
 #### (2) Create the k-mers count matrices at the population level.
@@ -213,7 +212,6 @@ Options:
     -i <str>   kmer abundance sample list <sample1\nsample2....\nsampleN>
     -o <str>   output prefix
     -h         show usage document
-
 ```
 
 After creating the k-mers count, there is no longer a need for separate k-mers count from each individual. Therefore, to save space, all these .kc files can be removed.
@@ -233,7 +231,6 @@ kmeria flt    -h          Print usage. \
               -s  FLOAT   Missing ratio. <missing_ratio,0.8> \
               -p  INT     Genome ploidy.  <ploidy,4> \
               -d  STR     Sample depth list. <sample_id\\tsequence depth>
-
 ```
 
 #### (4) Convert k-mer count matrices to BIMBAM dosage format
@@ -254,7 +251,6 @@ do
 done
 
 kmeria b2g -i sampling_kmer.bimbam -s <sample_list> -o sampling.geno
-
 ```
 *b2g* This command is useful, if you want to calculate the PCA and kinship on sampling k-mers 
 using external software such as *PLINK* or *GEMMA* program.
@@ -262,7 +258,6 @@ using external software such as *PLINK* or *GEMMA* program.
 ```
 plink --vcf sampling.geno --make-bed --out sampling.geno
 gemma -bfile sampling.geno -gk -p phenotype.tsv -o kinship
-
 ```
 
 #### (6) k-mer-based assocation studies.
@@ -320,7 +315,6 @@ grep -vE '^Chr00|^tig|^scaf' sigkmer.assoc.blastn | awk '!a[$1]++' > sigkmer.ass
 
 awk '{print $1"\t"$2"\t"$9"\t"$10}' sigkmer.assoc.blastn.filter|sort -k2,2 -k3,3n > sigkmer.blastn.genome.coord
 awk -F '_|\t' '{print $1"_"$2"\t"$4"\t"$5"\t"$3}' sigkmer.blastn.genome.coord > sigkmer.assoc.blastn.plot.txt
-
 ```
 
 #### Graph-based pangenome architectures improve physical mapping precision of association-linked k-mers.
@@ -345,7 +339,6 @@ cat *_sigkmer_asso_r2.fastq > trait_assoc_r2.fastq
 minigraph -x sr -t $threads pangenome.gfa trait_assoc_r1.fastq trait_assoc_r2.fastq -o trait_aln.gaf
 
 # Manhattan plot input file generation through standardized text processing of GAF results.
-
  ```
 
 #### Strategies enable enhanced alignment accuracy to linear monoploid reference genomes through positional constraints derived from association-kmer-linked reads.
@@ -370,7 +363,6 @@ cat *_sigkmer_asso_r2.fastq > trait_assoc_r2.fastq
 minimap2 -x sr -t 32 Ss09_hap1.fa TN_assoc_R1.fastq TN_assoc_R2.fastq -o TN_aln.paf
 
 # Manhattan plot input file generation through standardized text processing of PAF results.
-
  ```
 
 ## <a name="misc"></a> Miscellaneous
@@ -386,7 +378,6 @@ minimap2 -x sr -t 32 Ss09_hap1.fa TN_assoc_R1.fastq TN_assoc_R2.fastq -o TN_aln.
 
 # Manhattan Plot
 /scripts/plot_manhattan.R
-
  ```
 
 ## <a name="contact"></a> Contact
