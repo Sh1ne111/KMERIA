@@ -5,12 +5,11 @@
 
 <img src="./images/image1.png" alt="" width="400" height="550">
 
-## Overview
+## <a name="intro"></a> Introduction
 
 This repository contains an implementation of a k-mer-based method for Genome-Wide Association Studies (GWAS) in complex polyploid organisms (e.g., sugarcane, potato, sweetpotato, alfalfa，...). The approach is equally applicable to diploid species. By leveraging k-mer abundance profiles and statistical modeling, the method identifies associations between genetic variants and phenotypic traits.
 
-## Features
-
+## <a name="features"></a> Features
 
 - **Enhanced Genetic Variability Detection:** KMERIA can capture a wider range of genetic variants, including structural variations and copy number variations, which are often overlooked in traditional GWAS.
 
@@ -21,12 +20,23 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 - **Facilitated Genotype Identification:** KMERIA reduce the complexity of identifying genotypes in polyploids, facilitating faster and more efficient association analyses.
 
 
-## Prerequisites
+- [Introduction](#intro)
+- [Features](#features)
+- [Prerequisites](#prere)
+- [Installation](#install)
+- [Getting Started](#started)
+  - [kmeria pipeline (easy mode)](#easymode)
+  - [kmeria overview (detailed steps)](#detailedsteps)
+- [Miscellaneous](#misc)
+- [Contact](#contact)
+- [Citation](#citing)
+
+## <a name="prere"></a> Prerequisites
 
 - C/C++ compiler
 - Linux system
 
-## Installation
+## <a name="install"></a> Installation
    ```bash
    
    Clone the repository:
@@ -52,8 +62,8 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
    
 ```
 
-## Usage
-#### kmeria pipeline (easy mode)
+## <a name="started"></a> Getting Started
+#### <a name="kmeria pipeline easy mode"></a> kmeria pipeline (easy mode)
 
 kmeria_wrapper.pl is a wrapper script for generating job scripts for the KMERIA pipeline,
 with support for various job schedulers (SLURM, SGE, PBS). These scripts need to be manually
@@ -82,7 +92,7 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --queue hebhcnormal01
    ```
 
-#### 1. kmeria overview (detailed steps)
+#### 1. <a name="kmeria overview detailed steps"></a> kmeria overview (detailed steps)
 
    ```bash
   #--------------------------------------------------------------------------------------#
@@ -360,7 +370,7 @@ minimap2 -x sr -t 32 Ss09_hap1.fa TN_assoc_R1.fastq TN_assoc_R2.fastq -o TN_aln.
 
  ```
 
-## Miscellaneous
+## <a name="misc"></a> Miscellaneous
 
  ```
 # Get the k-mer dosage from the filtered k-mer counting matrices.
@@ -376,11 +386,11 @@ minimap2 -x sr -t 32 Ss09_hap1.fa TN_assoc_R1.fastq TN_assoc_R2.fastq -o TN_aln.
 
  ```
 
-## Contact
+## <a name="contact"></a> Contact
 For questions or feedback, please contact [Chen Shuai] at [chensss1209@gmail.com].
 
 
-## <span id="citing">Citation</span>
+## <a name="citing"></a> <span id="citing">Citation</span>
 
 If you have used KMERIA in your research, please cite below:
 
