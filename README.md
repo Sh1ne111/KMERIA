@@ -12,7 +12,7 @@
 - [Prerequisites](#prere)
 - [Installation](#install)
 - [Getting Started](#started)
-  - [kmeria pipeline (easy mode)](#easymode)
+  - [kmeria pipeline (easy mode)](#easymode) [Wiki](https://github.com/Sh1ne111/KMERIA/wiki)
   - [kmeria overview (detailed steps)](#detailedsteps)
 - [Miscellaneous](#misc)
 - [Contact](#contact)
