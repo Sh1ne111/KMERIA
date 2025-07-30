@@ -5,6 +5,20 @@
 
 <img src="./images/image1.png" alt="" width="400" height="550">
 
+## Table of Contents
+
+- [Introduction](#intro)
+- [Features](#features)
+- [Prerequisites](#prere)
+- [Installation](#install)
+- [Getting Started](#started)
+  - [kmeria pipeline (easy mode)](#easymode)
+  - [kmeria overview (detailed steps)](#detailedsteps)
+- [Miscellaneous](#misc)
+- [Contact](#contact)
+- [Citation](#citing)
+
+
 ## <a name="intro"></a> Introduction
 
 This repository contains an implementation of a k-mer-based method for Genome-Wide Association Studies (GWAS) in complex polyploid organisms (e.g., sugarcane, potato, sweetpotato, alfalfa，...). The approach is equally applicable to diploid species. By leveraging k-mer abundance profiles and statistical modeling, the method identifies associations between genetic variants and phenotypic traits.
@@ -19,17 +33,6 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 
 - **Facilitated Genotype Identification:** KMERIA reduce the complexity of identifying genotypes in polyploids, facilitating faster and more efficient association analyses.
 
-
-- [Introduction](#intro)
-- [Features](#features)
-- [Prerequisites](#prere)
-- [Installation](#install)
-- [Getting Started](#started)
-  - [kmeria pipeline (easy mode)](#easymode)
-  - [kmeria overview (detailed steps)](#detailedsteps)
-- [Miscellaneous](#misc)
-- [Contact](#contact)
-- [Citation](#citing)
 
 ## <a name="prere"></a> Prerequisites
 
