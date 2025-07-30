@@ -12,8 +12,8 @@
 - [Prerequisites](#prere)
 - [Installation](#install)
 - [Getting Started](#started)
-  - [kmeria pipeline (easy mode)](#easymode) [Wiki](https://github.com/Sh1ne111/KMERIA/wiki)
-  - [kmeria overview (detailed steps)](#detailedsteps)
+  - [KMERIA pipeline (easy mode)](#easymode) [Wiki](https://github.com/Sh1ne111/KMERIA/wiki)
+  - [KMERIA overview (detailed steps)](#detailedsteps)
 - [Miscellaneous](#misc)
 - [Contact](#contact)
 - [Citation](#citing)
@@ -66,7 +66,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 ```
 
 ## <a name="started"></a> Getting Started
-#### <a name="kmeria pipeline easy mode"></a> kmeria pipeline (easy mode)
+#### <a name="easymode"></a> KMERIA pipeline (easy mode)
 
 kmeria_wrapper.pl is a wrapper script for generating job scripts for the KMERIA pipeline,
 with support for various job schedulers (SLURM, SGE, PBS). These scripts need to be manually
@@ -95,7 +95,7 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --queue hebhcnormal01
    ```
 
-#### 1. <a name="kmeria overview detailed steps"></a> kmeria overview (detailed steps)
+#### 1. <a name="detailedsteps"></a> KMERIA overview (detailed steps)
 
    ```bash
   #--------------------------------------------------------------------------------------#
