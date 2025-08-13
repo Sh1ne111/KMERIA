@@ -71,7 +71,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 kmeria_wrapper.pl is a wrapper script for generating job scripts for the KMERIA pipeline,
 with support for various job schedulers (SLURM, SGE, PBS). These scripts need to be manually
 submitted to the cluster system. 
-Instructions for usage are provided in the [Wiki](https://github.com/Sh1ne111/KMERIA/wiki). A usage example can be found in the [examples] (https://github.com/Sh1ne111/KMERIA/tree/main/examples) directory.
+Instructions for usage are provided in the [Wiki](https://github.com/Sh1ne111/KMERIA/wiki). A usage example can be found in the examples directory (https://github.com/Sh1ne111/KMERIA/tree/main/examples).
 
   ```bash
 perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
