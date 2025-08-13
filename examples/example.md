@@ -2,7 +2,7 @@
 
 This script is an example for downloading sweet potato SRA data and simulating phenotypes for KMERIA analyses
 
-Usage: run_example_pipeline.sh -s <sra_list_file> -p <phenotype_file> -d <depth_file> [options]
+Usage: run_example_pipe.sh -s <sra_list_file> -p <phenotype_file> -d <depth_file> [options]
 
 Required Arguments:
     -s, --sra-list      File containing SRA accession numbers (one per line)
