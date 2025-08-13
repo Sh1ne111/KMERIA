@@ -1,5 +1,5 @@
 
-## This script is an example for downloading sweet potato SRA data and simulating phenotypes for KMERIA analyses
+### This script is an example for downloading sweet potato SRA data and simulating phenotypes for KMERIA analyses
 
 ```bash
 
