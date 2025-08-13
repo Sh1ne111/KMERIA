@@ -45,3 +45,10 @@ Steps:
 
 Note: This pipeline generates job scripts that need to be submitted manually to your cluster system.
 ```
+### sweet potato data
+
+```bash
+# command
+run_example_pipe.sh -s sample_sra.list -p simulated_phenotype1.tsv -d sample_depth.tsv
+
+```
