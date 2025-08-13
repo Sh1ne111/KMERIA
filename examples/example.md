@@ -1,6 +1,7 @@
-```bash
 
-This script is an example for downloading sweet potato SRA data and simulating phenotypes for KMERIA analyses
+## This script is an example for downloading sweet potato SRA data and simulating phenotypes for KMERIA analyses
+
+```bash
 
 Usage: run_example_pipe.sh -s <sra_list_file> -p <phenotype_file> -d <depth_file> [options]
 
