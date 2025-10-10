@@ -9,7 +9,7 @@ use Cwd qw(abs_path);
 use threads;
 use Pod::Usage;
 
-our $VERSION = "1.0.1";
+our $VERSION = "1.0.2";
 our $PROGRAM = "kmeria_wrapper.pl";
 
 # Default parameters
@@ -322,6 +322,7 @@ sub run_count_step {
                 
                 # Run KMC using the file list
                 print $fh "# Run KMC with the file list\n";
+				# Turn off the cononical mode and fixed the error of max abundance parameter 
                 print $fh "kmc -k$kmer_size -t$threads -m$kmc_memory -b -ci$min_abundance -cs$max_abundance \\\n";
                 print $fh "    \@$output/${sample}_fastq_list.txt $output/${sample}_k${kmer_size} $output/$sample\n";
                 
