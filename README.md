@@ -45,7 +45,14 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
    Clone the repository:
 
    git clone https://github.com/Sh1ne111/KMERIA.git
+
+   #To avoid the GNU C++ Runtime Library conflicts, you can build conda virtual environments to ensure that dependent libraries are installed
+   conda env create -f kmeriaenv.yml
    
+   export LD_LIBRARY_PATH=/your_path/kmeriaenv/lib:$LD_LIBRARY_PATH
+
+   conda activate kmeriaenv 
+
    cd KMERIA
    chmod 755 /your_path/KMERIA/bin/*
    chmod 755 /your_path/KMERIA/external_tools/*
@@ -54,14 +61,6 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
    export PATH=/your_path/KMERIA/bin:/your_path/KMERIA/external_tools:$PATH
    #htslib
    export LD_LIBRARY_PATH=/your_path/KMERIA/lib:$LD_LIBRARY_PATH
-
-
-   #To avoid the GNU C++ Runtime Library conflicts, you can build conda virtual environments to ensure that dependent libraries are installed
-   conda env create -f kmeriaenv.yml
-   
-   export LD_LIBRARY_PATH=/your_path/kmeriaenv/lib:$LD_LIBRARY_PATH
-
-   conda activate kmeriaenv 
    
 ```
 
