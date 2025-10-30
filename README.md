@@ -46,6 +46,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 ## <a name="prere"></a> Prerequisites
 
 - C/C++ compiler
+- GNU make 
 - Linux system
 
 ## <a name="install"></a> Installation
