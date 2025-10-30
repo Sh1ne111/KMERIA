@@ -162,7 +162,6 @@ Additional Help:
 #===========================================================================#
 ```
 
-For detailed usage and parameters for each command, please see the [**Command Reference on our Wiki**](https://github.com/Sh1ne111/KMERIA/wiki).
 
 ## <a name="misc"></a> Miscellaneous Tools
 
