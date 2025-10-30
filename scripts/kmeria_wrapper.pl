@@ -580,7 +580,7 @@ sub run_convert_step {
     $input = abs_path($input);
     $depth_file = abs_path($depth_file);
     
-    =
+    
     my $job_script = "$output/convert_job.sh";
     open(my $fh, '>', $job_script) or die "Cannot create job script $job_script: $!";
     
