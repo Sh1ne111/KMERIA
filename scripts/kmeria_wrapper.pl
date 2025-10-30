@@ -680,7 +680,12 @@ sub run_asso_step {
         print $fh "    --out $output/pca/samplPCA\n\n";
         
         print $fh "# Format PCA output as covariate file\n";
-        print $fh "cat $output/pca/samplPCA.eigenvec | awk '{print \$1,\$2,\$3,\$4,\$5}' > $output/pca/PCA.txt\n\n";
+        if ($use_bimbam_tools) {
+            print $fh "cat $output/pca/samplPCA.eigenvec | awk '{print \$1,\$2,\$3,\$4,\$5}' > $output/pca/PCA.txt\n\n";
+        } else {
+            print $fh "cat $output/pca/samplPCA.eigenvec | awk '{print \"1\",\$3,\$4,\$5}' > $output/pca/PCA.txt\n\n";
+        }
+        
         $covar_file = "$output/pca/PCA.txt";
     } else {
         $covar_file = abs_path($covar_file);
@@ -709,8 +714,16 @@ sub run_asso_step {
         $kinship_file = abs_path($kinship_file);
     }
     
-    # Run association analysis with kassoc
-    print $fh "# Run association analysis with kassoc\n";
+    # Run association analysis with bimbamAsso
+   if ($use_bimbam_tools) {
+       print $fh "# Generate sample list file for bimbamAsso\n";
+       print $fh "echo 'Generating sample list...'\n";
+    if ($depth_file) {
+        print $fh "cut -f1 $depth_file | awk '{print \$1,\$1}' > $output/sample.list\n\n";
+    }
+}
+    
+    print $fh "# Run association analysis with bimbamAsso\n";
     print $fh "echo 'Running association analysis...'\n";
     print $fh "kmeria asso --tool $tool \\\n";
     print $fh "    -i $input \\\n";
@@ -722,6 +735,7 @@ sub run_asso_step {
     if ($use_bimbam_tools) {
         print $fh "    --bimbam-gzip \\\n";
         print $fh "    --out-precision $output_precision \\\n";
+        print $fh "    -s $output/sample.list \\\n";
     }
     if ($covar_file) {
         print $fh "    -c $covar_file \\\n";
