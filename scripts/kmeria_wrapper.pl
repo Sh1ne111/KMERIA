@@ -712,7 +712,7 @@ sub run_asso_step {
     # Run association analysis with kassoc
     print $fh "# Run association analysis with kassoc\n";
     print $fh "echo 'Running association analysis...'\n";
-    print $fh "kassoc --tool $tool \\\n";
+    print $fh "kmeria asso --tool $tool \\\n";
     print $fh "    -i $input \\\n";
     print $fh "    -p $pheno_file \\\n";
     print $fh "    -n $pheno_col \\\n";
