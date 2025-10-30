@@ -75,18 +75,18 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --output /path/to/kmeria_results \
   --samples sample.list \
   --threads 32 \
-  --memory 32G \
   --kmer 31 \
   --min-abund 5 \
   --max-abund 1000 \
   --batch_size 2 \
-  --use-kmc2 \
-  # --use-kctm \      # optional
+  --use-kmc \
   --kmc-memory 32 \
   --ploidy 4 \
   --depth-file /path/to/sample_depths.txt \
   --pheno /path/to/phenotypes.txt \
   --pheno-col 1 \
+  --use-bimbam-tools \  # Optional: Use 'bimbamAsso' instead of 'gemma'
+  --parallel-bimbam 32 \
   --scheduler slurm \
   --queue hebhcnormal01
 ```
