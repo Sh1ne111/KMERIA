@@ -13,7 +13,7 @@
 - [Installation](#install)
 - [Getting Started](#started)
   - [KMERIA pipeline (easy mode)](#easymode) [Wiki](https://github.com/Sh1ne111/KMERIA/wiki/Pipeline-(Easy-Mode))
-  - [KMERIA overview (detailed steps)](#https://github.com/Sh1ne111/KMERIA/wiki/Detailed-Step-by-Step-Tutorial))
+  - [KMERIA overview (detailed steps)](https://github.com/Sh1ne111/KMERIA/wiki/Detailed-Step-by-Step-Tutorial))
 - [Miscellaneous](#misc)
 - [Contact](#contact)
 - [Citation](#citing)
@@ -154,7 +154,7 @@ Additional Help:
 
 For detailed usage and parameters for each command, please see the [**Command Reference on our Wiki**](https://github.com/Sh1ne111/KMERIA/wiki).
 
-## <a name="miscellaneous-tools"></a> Miscellaneous Tools
+## <a name="misc"></a> Miscellaneous Tools
 
 KMERIA also includes several utility scripts located in the `/bin` and `/scripts` directories:
 
