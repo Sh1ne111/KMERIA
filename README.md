@@ -54,12 +54,12 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 
    make && make install
    make clean
- 
-   chmod 755 /your_path/KMERIA/bin/*
+
+   # Change Permissions
    chmod 755 /your_path/KMERIA/external_tools/*
    chmod 755 /your_path/KMERIA/bimbamAsso/*
 
-   #Need to add PATH environment
+   #Add PATH environment
    export PATH=/your_path/KMERIA/bin:/your_path/KMERIA/bimbamAsso:/your_path/KMERIA/external_tools:$PATH
    
 ```
