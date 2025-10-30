@@ -16,19 +16,6 @@ Optional parameters
 
 ## bimbamAsso usage
 ```
-Usage: bimbamKin [input_file] [output_file]
-Required parameters
-        [input_file] : bimbam dosage file (support .gz)
-        [output_file]: output file name (required for bimbam)
-        -b           : input is bimbam dosage format
-Optional parameters
-        -g           : input bimbam file is gzip compressed
-        -d [# digits]: precision of the kinship values (default : 10)
-        -s           : compute IBS matrix instead of BN
-        -r           : randomly fill missing genotypes
-        -h           : use hetero division for missing data
-        -v           : turn on verbose mode
-(kmeria_env) [agis_chenshuai@login02 software]$ bimbamAsso
 Usage: bimbamAsso [options]
 
 Required parameters:
