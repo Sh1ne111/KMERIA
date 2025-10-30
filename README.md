@@ -152,7 +152,7 @@ Additional Help:
 #===========================================================================#
 ```
 
-For detailed usage and parameters for each command, please see the [**Command Reference on our Wiki**](https://github.com/Sh1ne111/KMERIA/wiki/Command-Reference).
+For detailed usage and parameters for each command, please see the [**Command Reference on our Wiki**](https://github.com/Sh1ne111/KMERIA/wiki).
 
 ## <a name="miscellaneous-tools"></a> Miscellaneous Tools
 
@@ -162,7 +162,7 @@ KMERIA also includes several utility scripts located in the `/bin` and `/scripts
 - `/scripts/calc_gwas_threshold_new.R`: Calculate the GWAS significance threshold.
 - `/scripts/plot_manhattan.R`: Helper script for plotting Manhattan plots.
 
-Usage instructions are available on the [**Wiki**](https://github.com/Sh1ne111/KMERIA/wiki/Miscellaneous-Tools).
+Usage instructions are available on the [**Wiki**](https://github.com/Sh1ne111/KMERIA/wiki).
 
 ## <a name="contact"></a> Contact
 
