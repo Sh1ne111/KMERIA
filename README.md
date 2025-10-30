@@ -33,6 +33,15 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 
 - **Facilitated Genotype Identification:** KMERIA reduce the complexity of identifying genotypes in polyploids, facilitating faster and more efficient association analyses.
 
+**Recent updates:**
+
+* KMERIA Version 2.0.1 (2025.10.30):
+  - K-mer matrix construction is now more efficient and consumes fewer resources;
+  - Updated filter step to use new compressed output format;
+  - Enhanced m2b step with BGZF compression and statistics;
+  - Updated the association step to use our newly implemented bimbamAsso tool **bimbamAsso**
+
+* KMERIA Version 0.0.1 (2024.10.14) is no longer be maintained
 
 ## <a name="prere"></a> Prerequisites
 
