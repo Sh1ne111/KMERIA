@@ -9,7 +9,7 @@ use Cwd qw(abs_path);
 use threads;
 use Pod::Usage;
 
-our $VERSION = "2.0.0";
+our $VERSION = "2.0.1";
 our $PROGRAM = "kmeria_wrapper.pl";
 
 
@@ -86,11 +86,10 @@ GetOptions(
     "kinship-precision=i" => \$kinship_precision,
     "output-precision=i"  => \$output_precision,
     "use-kmc"           => \$use_kmc,
-    "kmc-memory=i"      => \$kmc_memory,
-    "count-separate-strands|C" => \$count_separate_strands,
+    "count-separate-strands" => \$count_separate_strands,
     "text-output|T"     => \$text_output,
     "partition-bits=i"  => \$partition_bits,
-    "compress-homopolymers|c" => \$compress_homopolymers,
+    "compress-homopolymers" => \$compress_homopolymers,
 ) or pod2usage(2);
 
 
@@ -122,6 +121,64 @@ sub initialize_directories {
     $asso_dir = "$base_dir/05_association";
     
     return ($count_dir, $kctm_dir, $filter_dir, $bimbam_dir, $asso_dir);
+}
+
+# ===== NEW FUNCTIONS FOR SAMPLE ORDER MANAGEMENT =====
+
+sub read_sample_list {
+    my ($sample_file) = @_;
+    my @samples;
+    
+    if ($sample_file && -f $sample_file) {
+        open(my $fh, '<', $sample_file) or die "Cannot open sample list $sample_file: $!";
+        while (my $line = <$fh>) {
+            chomp $line;
+            $line =~ s/^\s+|\s+$//g;  # Remove leading/trailing whitespace
+            next if $line =~ /^\s*$/;  # Skip empty lines
+            next if $line =~ /^#/;     # Skip comment lines
+            push @samples, $line;
+        }
+        close($fh);
+    }
+    
+    return @samples;
+}
+
+sub save_sample_order {
+    my ($output_dir, @samples) = @_;
+    
+    my $order_file = "$output_dir/sample_order.txt";
+    open(my $fh, '>', $order_file) or die "Cannot create sample order file $order_file: $!";
+    foreach my $sample (@samples) {
+        print $fh "$sample\n";
+    }
+    close($fh);
+    
+    print "Sample order saved to: $order_file\n";
+    print "Total samples: " . scalar(@samples) . "\n";
+    
+    return $order_file;
+}
+
+sub verify_sample_order {
+    my ($dir1, $file1, $dir2, $file2) = @_;
+    
+    my @samples1 = read_sample_list("$dir1/$file1");
+    my @samples2 = read_sample_list("$dir2/$file2");
+    
+    if (scalar(@samples1) != scalar(@samples2)) {
+        warn "WARNING: Sample count mismatch between $file1 and $file2\n";
+        return 0;
+    }
+    
+    for (my $i = 0; $i < scalar(@samples1); $i++) {
+        if ($samples1[$i] ne $samples2[$i]) {
+            warn "WARNING: Sample order mismatch at position $i: $samples1[$i] vs $samples2[$i]\n";
+            return 0;
+        }
+    }
+    
+    return 1;
 }
 
 
@@ -261,14 +318,7 @@ sub run_count_step {
     
     my @samples;
     if ($sample_list && -f $sample_list) {
-        
-        open(my $fh, '<', $sample_list) or die "Cannot open file $sample_list: $!";
-        while (my $line = <$fh>) {
-            chomp $line;
-            next if $line =~ /^\s*$/;  # Skip empty lines
-            push @samples, $line;
-        }
-        close($fh);
+        @samples = read_sample_list($sample_list);
     } elsif (-d $input) {
         $input = abs_path($input);
         # If input is a directory, find all FASTQ files
@@ -289,6 +339,9 @@ sub run_count_step {
     if (scalar(@samples) == 0) {
         die "Error: No samples found to process\n";
     }
+    
+    # ===== SAVE SAMPLE ORDER =====
+    save_sample_order($output, @samples);
     
     # Process samples in batches
     my $total_samples = scalar(@samples);
@@ -378,7 +431,7 @@ sub run_count_step {
                 # Add optional flags
                 $kmeria_cmd .= " -C" if $count_separate_strands;
                 $kmeria_cmd .= " -T" if $text_output;
-                $kmeria_cmd .= " -p $partition_bits" if $partition_bits != 16;
+                $kmeria_cmd .= " -p $partition_bits" if defined $partition_bits;
                 $kmeria_cmd .= " -c" if $compress_homopolymers;
                 
                 # Determine output format extension
@@ -453,6 +506,13 @@ sub run_kctm_step {
     $output = abs_path($output);
     $input = abs_path($input);
     
+    # ===== CHECK FOR SAMPLE ORDER FILE =====
+    my $sample_order_file = "$input/sample_order.txt";
+    if (!-f $sample_order_file) {
+        warn "WARNING: Sample order file not found at $sample_order_file\n";
+        warn "Will use alphabetical order from ls command (may cause order mismatch)\n";
+    }
+    
     # Create job script
     my $job_script = "$output/kctm_job.sh";
     open(my $fh, '>', $job_script) or die "Cannot create job script $job_script: $!";
@@ -464,12 +524,32 @@ sub run_kctm_step {
     print $fh "echo 'K-mer Matrix Construction'\n";
     print $fh "echo '========================================'\n\n";
     
-    # Create sample list file for kctm
-    print $fh "# Create list of sorted k-mer database files\n";
-
-#    print $fh "ls $input/*_sort_k${kmer_size}.kmc_pre|sed "s\/\.kmc_pre\/\/g" > $output/sample_sort_k${kmer_size}.list\n\n";
-    print $fh qq{ls $input/*_sort_k${kmer_size}.kmc_pre|sed "s/\\.kmc_pre//g" > $output/sample_sort_k${kmer_size}.list\n\n};  
-
+    # ===== CRITICAL FIX: USE SAMPLE ORDER FILE =====
+    print $fh "# Create list of sorted k-mer database files in CORRECT ORDER\n";
+    
+    if (-f $sample_order_file) {
+        print $fh "# Using sample order from: $sample_order_file\n";
+        print $fh "if [ ! -f $sample_order_file ]; then\n";
+        print $fh "    echo 'ERROR: Sample order file not found: $sample_order_file'\n";
+        print $fh "    exit 1\n";
+        print $fh "fi\n\n";
+        
+        print $fh "# Generate sample list based on original order\n";
+        print $fh "> $output/sample_sort_k${kmer_size}.list\n";
+        print $fh "while IFS= read -r sample; do\n";
+        print $fh "    kmer_file=\"$input/\${sample}_sort_k${kmer_size}\"\n";
+        print $fh "    if [ -f \"\${kmer_file}.kmc_pre\" ] && [ -f \"\${kmer_file}.kmc_suf\" ]; then\n";
+        print $fh "        echo \"\${kmer_file}\" >> $output/sample_sort_k${kmer_size}.list\n";
+        print $fh "    else\n";
+        print $fh "        echo \"WARNING: K-mer files not found for sample: \$sample\"\n";
+        print $fh "        echo \"Expected: \${kmer_file}.kmc_pre and \${kmer_file}.kmc_suf\"\n";
+        print $fh "    fi\n";
+        print $fh "done < $sample_order_file\n\n";
+    } else {
+        print $fh "# WARNING: No sample order file found, using alphabetical order\n";
+        print $fh qq{ls $input/*_sort_k${kmer_size}.kmc_pre | sed "s/\\.kmc_pre//g" | sort > $output/sample_sort_k${kmer_size}.list\n\n};
+    }
+    
     print $fh "# Check if sample list is not empty\n";
     print $fh "if [ ! -s $output/sample_sort_k${kmer_size}.list ]; then\n";
     print $fh "    echo 'ERROR: No sorted k-mer files found in $input'\n";
@@ -478,19 +558,39 @@ sub run_kctm_step {
     
     print $fh "echo \"Found \$(wc -l < $output/sample_sort_k${kmer_size}.list) samples for matrix construction\"\n\n";
     
+    # ===== PRINT SAMPLE LIST FOR VERIFICATION =====
+    print $fh "# Print sample list for verification\n";
+    print $fh "echo \"Sample order:\"\n";
+    print $fh "cat $output/sample_sort_k${kmer_size}.list\n";
+    print $fh "echo \"\"\n\n";
+    
     # Run kmeria kctm
     print $fh "# Build k-mer count matrix\n";
     print $fh "kmeria kctm -i $output/sample_sort_k${kmer_size}.list \\\n";
     print $fh "    -o $output/sample_k${kmer_size} \\\n";
     print $fh "    -v --no-header -b $kctm_batch\n\n";
     
+    # ===== SAVE KCTM SAMPLE ORDER =====
+    print $fh "# Save sample order used in kctm for verification\n";
+    print $fh "cat $output/sample_sort_k${kmer_size}.list | xargs -n1 basename | sed 's/_sort_k${kmer_size}\$//' > $output/kctm_sample_order.txt\n\n";
+    
     print $fh "echo 'K-mer matrix construction completed successfully'\n";
+    print $fh "echo 'Sample order saved to: $output/kctm_sample_order.txt'\n";
     
     close($fh);
     chmod 0755, $job_script;
     
     print "Generated script: $job_script\n";
     print "K-mer matrix building job script has been generated.\n";
+    
+    if (-f $sample_order_file) {
+        print "✓ Sample order file found: $sample_order_file\n";
+        print "✓ K-mer matrix will use the same sample order as count step\n";
+    } else {
+        print "✗ WARNING: No sample order file found!\n";
+        print "  The sample order may not match the original sample list\n";
+    }
+    
     print "Please submit it manually to your cluster system after all counting jobs complete.\n\n";
 }
 
@@ -531,6 +631,26 @@ sub run_filter_step {
     print $fh "echo '========================================'\n";
     print $fh "echo 'K-mer Matrix Filtering'\n";
     print $fh "echo '========================================'\n\n";
+    
+    # ===== VERIFY SAMPLE ORDER =====
+    print $fh "# Verify sample order consistency\n";
+    my $count_order = abs_path("$count_dir/sample_order.txt");
+    my $kctm_order = abs_path("$input/kctm_sample_order.txt");
+    
+    print $fh "if [ -f $count_order ] && [ -f $kctm_order ]; then\n";
+    print $fh "    echo 'Checking sample order consistency...'\n";
+    print $fh "    if ! diff -q $count_order $kctm_order > /dev/null 2>&1; then\n";
+    print $fh "        echo 'WARNING: Sample order mismatch detected!'\n";
+    print $fh "        echo 'Count order: $count_order'\n";
+    print $fh "        echo 'KCTM order: $kctm_order'\n";
+    print $fh "        diff $count_order $kctm_order || true\n";
+    print $fh "    else\n";
+    print $fh "        echo '✓ Sample order is consistent'\n";
+    print $fh "    fi\n";
+    print $fh "else\n";
+    print $fh "    echo 'WARNING: Cannot verify sample order (order files not found)'\n";
+    print $fh "fi\n";
+    print $fh "echo ''\n\n";
     
     # Write actual commands
     print $fh "# Filter k-mer matrix\n";
@@ -604,9 +724,17 @@ sub run_convert_step {
     print $fh "# Create a sketch sample for PCA and kinship calculation\n";
     print $fh "kmeria sketch $output/*.bimbam.gz -n $sketch_size > $output/sampling.bimbam\n\n";
     
-    # Generate sample list
-    print $fh "# Generate sample list from depth file\n";
-    print $fh "cut -f1 $depth_file | sort | uniq > $output/tmp_sample.list\n\n";
+    # ===== USE ORIGINAL SAMPLE ORDER =====
+    print $fh "# Generate sample list from original sample order\n";
+    my $original_order = abs_path("$count_dir/sample_order.txt");
+    
+    print $fh "if [ -f $original_order ]; then\n";
+    print $fh "    echo 'Using original sample order from: $original_order'\n";
+    print $fh "    cp $original_order $output/tmp_sample.list\n";
+    print $fh "else\n";
+    print $fh "    echo 'WARNING: Original sample order not found, using depth file'\n";
+    print $fh "    cut -f1 $depth_file | sort | uniq > $output/tmp_sample.list\n";
+    print $fh "fi\n\n";
     
     # Convert to VCF
     print $fh "# Convert BIMBAM to VCF format\n";
@@ -715,15 +843,25 @@ sub run_asso_step {
     }
     
     # Run association analysis with bimbamAsso
-   if ($use_bimbam_tools) {
-       print $fh "# Generate sample list file for bimbamAsso\n";
-       print $fh "echo 'Generating sample list...'\n";
-    if ($depth_file) {
-        print $fh "cut -f1 $depth_file | awk '{print \$1,\$1}' > $output/sample.list\n\n";
+    if ($use_bimbam_tools) {
+        print $fh "# Generate sample list file for bimbamAsso\n";
+        print $fh "echo 'Generating sample list...'\n";
+        
+        # ===== USE ORIGINAL SAMPLE ORDER =====
+        my $original_order = abs_path("$count_dir/sample_order.txt");
+        
+        print $fh "if [ -f $original_order ]; then\n";
+        print $fh "    echo 'Using original sample order from: $original_order'\n";
+        print $fh "    cat $original_order | awk '{print \$1,\$1}' > $output/sample.list\n";
+        print $fh "else\n";
+        if ($depth_file) {
+            print $fh "    echo 'WARNING: Using depth file for sample order'\n";
+            print $fh "    cut -f1 $depth_file | awk '{print \$1,\$1}' > $output/sample.list\n";
+        }
+        print $fh "fi\n\n";
     }
-}
     
-    print $fh "# Run association analysis with bimbamAsso\n";
+    print $fh "# Run association analysis\n";
     print $fh "echo 'Running association analysis...'\n";
     print $fh "kmeria asso --tool $tool \\\n";
     print $fh "    -i $input \\\n";
@@ -759,7 +897,7 @@ __END__
 
 =head1 NAME
 
-kmeria_wrapper.pl - A parallel wrapper for KMERIA pipeline (v2.0)
+kmeria_wrapper.pl - A parallel wrapper for KMERIA pipeline (v2.0.1)
 
 =head1 SYNOPSIS
 
@@ -798,10 +936,10 @@ kmeria_wrapper.pl --step <step> [options]
    --kmc-memory      [INT]      Memory allocation for KMC in GB [default: 16]
    
    kmeria count-specific options (default):
-   -C|--count-separate-strands  Count strands separately (no canonical)
+   --count-separate-strands     Count strands separately (no canonical)
    -T|--text-output             Text output instead of binary
    --partition-bits  [INT]      Partitioning bits [default: 16]
-   -c|--compress-homopolymers   Compress homopolymers (experimental)
+   --compress-homopolymers      Compress homopolymers (experimental)
 
  For 'kctm' (K-mer matrix construction):
    --input|-i        [DIR]      Directory with sorted k-mer databases
@@ -840,12 +978,11 @@ kmeria_wrapper.pl is a wrapper script for generating job scripts for the KMERIA 
 It generates bash scripts that can be manually submitted to cluster job schedulers (SLURM, SGE, PBS)
 or executed locally.
 
-Key changes in v2.0:
-- kmeria count outputs binary format by default (optional text with -T)
-- Updated kctm parameters (batch mode, no-header)
-- New filter command with compressed output format
-- Enhanced m2b with BGZF compression and statistics
-- Updated association analysis using kassoc tool
+Key changes in v2.0.1:
+- **CRITICAL FIX**: Maintains consistent sample order across all pipeline steps
+- Sample order is saved from count step and reused in all downstream steps
+- Added verification checks to detect sample order mismatches
+- Prevents genotype-phenotype association errors due to sample order inconsistency
 
 =head1 WORKFLOW
 
@@ -878,18 +1015,7 @@ perl kmeria_wrapper.pl --step all \
   --scheduler slurm \
   --queue normal
 
-=head2 Count k-mers using 'kmeria count'
-
-perl kmeria_wrapper.pl --step count \
-  --input /data/fastq_files \
-  --output /results/01_kmer_counts \
-  --samples sample.list \
-  --threads 32 \
-  --kmer 31 \
-  --batch-size 4 \
-  --scheduler slurm
-
-=head2 Count k-mers using KMC (alternative method,recommended)
+=head2 Count k-mers using KMC (recommended)
 
 perl kmeria_wrapper.pl --step count \
   --input /data/fastq_files \
@@ -903,297 +1029,109 @@ perl kmeria_wrapper.pl --step count \
   --kmc-memory 16 \
   --scheduler slurm
 
-=head2 Count k-mers with text output and separate strand counting
+=head1 IMPORTANT NOTES ON SAMPLE ORDER
 
-perl kmeria_wrapper.pl --step count \
-  --input /data/fastq_files \
-  --output /results/01_kmer_counts \
-  --threads 32 \
-  --kmer 21 \
-  -C \
-  -T \
-  --batch-size 4
+This version (2.0.1) addresses a **CRITICAL** issue where sample order could become
+inconsistent between steps, leading to incorrect phenotype-genotype associations.
 
-=head2 Association analysis with kassoc (gemma mode)
+The fix works by:
+1. Saving the sample order from the count step to sample_order.txt
+2. Using this file in kctm to maintain the exact same order
+3. Verifying order consistency in subsequent steps
+4. Using the original order for all downstream analyses
 
-perl kmeria_wrapper.pl --step asso \
-  --input /results/04_bimbam \
-  --output /results/05_association \
-  --pheno phenotypes.txt \
-  --covar covariates.txt \
-  --threads 64 \
-  --kinship-precision 10 \
-  --output-precision 5
+**IMPORTANT**: If you're using pre-existing count results, ensure the samples are
+processed in the same order as your phenotype and depth files!
 
-=head2 Association analysis with kassoc (bimbamAsso mode)
+=head2 Verifying Sample Order
 
-perl kmeria_wrapper.pl --step asso \
-  --input /results/04_bimbam \
-  --output /results/05_association \
-  --pheno phenotypes.txt \
-  --covar covariates.txt \
-  --threads 64 \
-  --use-bimbam-tools \
-  --kinship-precision 10 \
-  --output-precision 5
+After running the pipeline, you can verify sample order consistency:
 
-=head1 K-MER COUNTING METHODS
+  # Check if sample order is consistent
+  diff 01_kmer_counts/sample_order.txt 02_kmer_matrices/kctm_sample_order.txt
+  
+  # Should show no differences if order is consistent
 
-The wrapper supports two k-mer counting methods:
+=head2 Sample Order Files
 
-=head2 Method 1: kmeria count (Default)
+- **01_kmer_counts/sample_order.txt**: Original sample order from count step
+- **02_kmer_matrices/kctm_sample_order.txt**: Sample order used in kctm
+- **04_bimbam/tmp_sample.list**: Sample order used for VCF/PLINK conversion
+- **05_association/sample.list**: Sample order used for association analysis
 
-
-B<Usage:>
-  perl kmeria_wrapper.pl --step count --input /data --output /results --kmer 31
-
-B<Generated command example:>
-  kmeria count -k 31 -t 32 -o sample1_k31.bin input.fq.gz
-
-B<Options specific to kmeria count:>
-  -C, --count-separate-strands  : Count forward and reverse strands separately
-                                  (disables canonical k-mer mode)
-  -T, --text-output            : Output in text format instead of binary
-#  --partition-bits INT         : Partitioning bits for memory optimization [default: 16]
-  -c, --compress-homopolymers  : Compress homopolymer regions (experimental)
-
-B<Output files:>
-  - Binary format (default): sample_k31.bin
-  - Text format (with -T):   sample_k31.txt
-
-=head2 Method 2: KMC (Alternative)
-
-B<Advantages:>
-- Well-established tool
-- Highly optimized for large datasets
-- Sorted output compatible with kctm
-
-B<Usage:>
-  perl kmeria_wrapper.pl --step count --input /data --output /results \
-    --kmer 31 --use-kmc --kmc-memory 16
-
-B<Generated command example:>
-  kmc -k31 -t32 -m16 -b -ci4 -cs1000 @sample_list.txt output_k31 temp_dir
-  kmc_tools transform output_k31 sort output_sort_k31
-
-B<Options specific to KMC:>
-  --use-kmc           : Enable KMC mode
-  --kmc-memory INT    : Memory allocation in GB [default: 16]
-  --min-abund INT     : Minimum k-mer abundance threshold [default: 4]
-  --max-abund INT     : Maximum k-mer abundance threshold [default: 1000]
-
-B<Output files:>
-  - sample_k31.kmc_pre, sample_k31.kmc_suf (unsorted KMC database)
-  - sample_sort_k31.kmc_pre, sample_sort_k31.kmc_suf (sorted for kctm)
-
-
-=head2 Complete pipeline with parallel association
-
-# Full workflow ending with parallel bimbamAsso
-perl kmeria_wrapper.pl --step all \
-  -i /data/fastq_files \
-  -o /results/full_analysis \
-  --samples sample_list.txt \
-  -d sample_depth.tsv \
-  --pheno traits.txt \
-  -k 31 \
-  -t 32 \
-  -p 4 \
-  --missing 0.6 \
-  --use-bimbam-tools \
-  --scheduler slurm
-
-# Same pipeline using KMC for counting
-perl kmeria_wrapper.pl --step all \
-  -i /data/fastq_files \
-  -o /results/full_analysis \
-  --samples sample_list.txt \
-  -d sample_depth.tsv \
-  --pheno traits.txt \
-  -k 31 \
-  -t 32 \
-  -p 4 \
-  --missing 0.6 \
-  --use-kmc \
-  --kmc-memory 24 \
-  --min-abund 5 \
-  --scheduler slurm
-
-Software dependencies:
-- KMERIA v2.0+[](https://github.com/Sh1ne111/KMERIA)
-- KMC v3.0+ (optional, use with --use-kmc)[](https://github.com/refresh-bio/KMC)
-- PLINK v1.9+
-- kassoc (custom association tool)
-- bimbamKin and bimbamAsso (if using --use-bimbam-tools)
-
-Perl modules:
-- Getopt::Long
-- File::Basename
-- File::Path
-- Cwd
-- Pod::Usage
+All these files should contain samples in the SAME order!
 
 =head1 FILE FORMATS
 
-=head2 Sample list file
+=head2 Sample list file (--samples)
 Plain text file with one sample name per line (no header):
   sample1
   sample2
   sample3
 
-=head2 Depth file (sample_depth.tsv)
+**IMPORTANT**: The order in this file will be preserved throughout the entire pipeline!
+
+=head2 Depth file (--depth-file)
 Tab-separated file with sample names and depth values:
   sample1    45.2
   sample2    52.8
   sample3    38.9
 
-=head2 Phenotype file
+**IMPORTANT**: Sample order should match the sample list file!
+
+=head2 Phenotype file (--pheno)
 Tab or space-separated file with format:
   sample1  1.5    0
   sample2  2.3    1
   sample3  1.8    1
 
-Note: The kassoc tool assumes the phenotype file has sample in column 1 and phenotype in the specified column (default 1, meaning column 2 if file has sample PHENO).
-
-=head2 Covariate file
-Tab or space-separated file with format:
-  FAMID  INDID  COV1  COV2  COV3  ...
-  1      sample1  0.5   1.2   -0.3
-  1      sample2  -0.2  0.8   0.5
-
-=head1 PERFORMANCE TIPS
-
-=head2 K-mer Counting Optimization
-
-B<For kmeria count (default):>
-- Adjust --partition-bits based on available memory:
-  * 16 bits (default): ~4GB RAM per thread
-  * 18 bits: ~1GB RAM per thread
-  * 20 bits: ~256MB RAM per thread
-- Use binary output (default) to save disk space
-- Process multiple samples in parallel with appropriate --batch-size
-
-B<For KMC (--use-kmc):>
-- Set --kmc-memory to 60-70% of available RAM
-- Use SSD/fast storage for temporary files
-- Adjust --min-abund and --max-abund to filter low-quality k-mers early
-
-=head2 Batch Size Selection
-
-The --batch-size parameter controls how many samples are processed per job script:
-- Small batches (2-4): Better for job scheduler queue management
-- Large batches (10-20): Fewer job scripts, easier to track
-- Consider: total samples, wall time limits, checkpoint/restart needs
-
-=head2 Association Analysis Optimization
-
-The association step uses the kassoc tool, which handles internal parallelism:
-- Use --threads to control concurrency level
-- For large datasets, use higher --threads (e.g., 64)
-- Pre-compute kinship and covariates for faster runs
+**IMPORTANT**: Sample order should match the sample list file!
 
 =head1 TROUBLESHOOTING
 
-=head2 Common Issues and Solutions
+=head2 Sample Order Mismatch
 
-B<Issue: "No samples found to process">
-- Check that FASTQ/FASTA files have correct extensions (.fq, .fastq, .fa, .fasta)
-- Verify --samples file contains valid sample names (one per line)
-- Ensure input directory path is correct
+If you see warnings about sample order mismatch:
 
-B<Issue: Jobs fail with "command not found">
-- Verify all required software is installed and in PATH
-- Load required modules on HPC: module load kmeria kmc plink kassoc
-- Check dependency status before running
+1. Check the sample_order.txt files in each step directory
+2. Verify your input files (sample list, depth file, phenotype file) have consistent order
+3. If using pre-existing count results, regenerate them with the correct sample order
+4. Use the verification commands:
+   
+   diff 01_kmer_counts/sample_order.txt 02_kmer_matrices/kctm_sample_order.txt
 
-=head2 Checking Job Status
+=head2 Missing sample_order.txt
 
-After submitting jobs to the cluster:
+If sample_order.txt is missing from the count step:
 
-  # SLURM
-  squeue -u $USER
-  sacct -j JOBID --format=JobID,JobName,State,ExitCode
-  
-  # SGE
-  qstat -u $USER
-  qacct -j JOBID
-  
-  # PBS
-  qstat -u $USER
-  tracejob JOBID
-
-=head2 Log File Locations
-
-Check log files for errors:
-  output_dir/01_kmer_counts/count_batch_0.log
-  output_dir/01_kmer_counts/count_batch_0.err
-  output_dir/02_kmer_matrices/kctm_job.log
-  output_dir/03_filtered_matrices/filter_job.log
-  output_dir/04_bimbam/convert_job.log
-  output_dir/05_association/asso_job.log
-
-=head1 FREQUENTLY ASKED QUESTIONS
-
-=head2 Should I use kmeria count or KMC?
-
-Use B<kmeria count> (default) for:
-- Most standard analyses
-- Faster processing time
-- Lower memory requirements
-- Direct KMERIA pipeline integration
-
-Use B<KMC> (--use-kmc) for:
-- Very large datasets (>100GB per sample)
-- When you need strict abundance filtering
-- Compatibility with other KMC-based workflows
-
-Consider:
-- Shorter k-mers: More sensitive, more false positives, less memory
-- Longer k-mers: More specific, fewer false positives, more memory
-
-=head2 How do I process paired-end reads?
-
-Both methods automatically detect and process paired-end files:
-- Files matching: sample_R1.fq.gz and sample_R2.fq.gz
-- Or: sample_1.fq.gz and sample_2.fq.gz
-
-The script will:
-- kmeria count: Process each file separately (generates multiple output files)
-- KMC: Combine both files in a single k-mer database
-
-=head2 Can I restart a failed pipeline?
-
-Yes! Since each step generates independent job scripts:
-1. Identify which step failed (check log files)
-2. Fix the issue (add memory, correct input files, etc.)
-3. Re-run only that specific step: --step count|kctm|filter|m2b|asso
-4. Continue with subsequent steps
-
-=head2 How do I speed up association analysis?
-
-The kassoc tool handles internal parallelism:
-- Use --threads to set concurrency (e.g., 64)
-- Ensure fast I/O (SSD storage)
-- Pre-compute kinship and covariates
-
-Choose tool mode with --use-bimbam-tools for bimbamAsso mode.
-
-=head1 AUTHOR
-
-Updated for KMERIA v2.0 pipeline
-Original concept based on KMERIA by Chen Shuai (chensss1209@gmail.com)
+1. The kctm step will fall back to alphabetical order (ls command)
+2. This may cause sample order mismatch
+3. **Solution**: Re-run the count step to generate sample_order.txt
 
 =head1 VERSION
 
-Version 2.0.0 - Major update with kmeria count support (2025)
+Version 2.0.1 - Sample order consistency fix (2025)
 
 =head1 CHANGELOG
+
+v2.0.1 (2025):
+- **CRITICAL FIX**: Ensures consistent sample order across all pipeline steps
+- Added sample_order.txt generation in count step
+- Modified kctm step to use sample_order.txt instead of ls output
+- Added sample order verification in filter and subsequent steps
+- Prevents mismatch between sample order in matrices and phenotype/depth files
+- All downstream steps now use the original sample order from count step
 
 v2.0.0 (2025):
 - Added support for all kmeria count parameters (-C, -T, -p, -c)
 - Updated filter step to use new compressed output format
 - Enhanced m2b step with BGZF compression and statistics
 - Updated association step to use kassoc tool
+
+=head1 AUTHOR
+
+Updated for KMERIA v2.0.1 - Sample order consistency fix
+Original concept based on KMERIA by Chen Shuai (chensss1209@gmail.com)
 
 =head1 SEE ALSO
 
