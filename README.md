@@ -97,7 +97,6 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --pheno /path/to/phenotypes.txt \
   --pheno-col 1 \
   --use-bimbam-tools \  # Optional: Use 'bimbamAsso' instead of 'gemma'
-  --parallel-bimbam 32 \
   --scheduler slurm \
   --queue hebhcnormal01
 ```
