@@ -39,7 +39,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
   - K-mer matrix construction is now more efficient and consumes fewer resources;
   - Updated filter step to use new compressed output format;
   - Enhanced m2b step with BGZF compression and statistics;
-  - Updated the association step to use our newly implemented bimbamAsso tool **bimbamAsso**
+  - Updated the association step to use our newly implemented Association tool **bimbamAsso**
 
 * KMERIA Version 0.0.1 (2024.10.14) is no longer be maintained
 
@@ -62,17 +62,17 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
    # htslib
    export LD_LIBRARY_PATH=/your_path/KMERIA/lib:$LD_LIBRARY_PATH
 
-   make && make install
-   make clean
-
    # Change Permissions
    chmod 755 /your_path/KMERIA/bin/*
    chmod 755 /your_path/KMERIA/external_tools/*
    chmod 755 /your_path/KMERIA/bimbamAsso/*
 
+   # For source installations
+   make && make install
+   make clean
+
    #Add PATH environment
    export PATH=/your_path/KMERIA/bin:/your_path/KMERIA/bimbamAsso:/your_path/KMERIA/external_tools:$PATH
-   
 ```
 
 
