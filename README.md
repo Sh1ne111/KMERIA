@@ -90,7 +90,7 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --kmer 31 \
   --min-abund 5 \
   --max-abund 1000 \
-  --batch_size 2 \
+  --batch-size 2 \
   --use-kmc \ # Optional, default: kmeria count
   --kmc-memory 32 \ # Optional, default: kmeria count
   --ploidy 4 \
