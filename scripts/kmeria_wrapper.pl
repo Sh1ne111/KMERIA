@@ -1,4 +1,10 @@
 #!/usr/bin/env perl
+#
+# Author: Chen Shuai (chensss1209@gmail.com)
+#
+# DEBUG (2025-11-11): Fixing the covariate format for the bimbamAsso analysis .
+# DEBUG (2025-11-09): Removed the temporary BIMBAM file after the PCA and kinship calculations were completed.
+#
 
 use strict;
 use warnings;
