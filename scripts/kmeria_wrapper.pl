@@ -811,7 +811,7 @@ sub run_asso_step {
         
         print $fh "# Format PCA output as covariate file\n";
         if ($use_bimbam_tools) {
-            print $fh "cat $output/pca/samplPCA.eigenvec | awk '{print \$1,\$2,\$3,\$4,\$5}' > $output/pca/PCA.txt\n\n";
+            print $fh "cat $output/pca/samplPCA.eigenvec | awk '{print \$1,\$2,\"1\",\$3,\$4,\$5}' > $output/pca/PCA.txt\n\n";
         } else {
             print $fh "cat $output/pca/samplPCA.eigenvec | awk '{print \"1\",\$3,\$4,\$5}' > $output/pca/PCA.txt\n\n";
         }
