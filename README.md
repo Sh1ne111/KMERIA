@@ -109,6 +109,7 @@ For detailed, step-by-step instructions, parameter explanations, and advanced us
 - **[Pipeline (Easy Mode)](https://github.com/Sh1ne111/KMERIA/wiki/Pipeline-(Easy-Mode))**: Detailed breakdown of the `kmeria_wrapper.pl` parameters.
 - **[Detailed Step-by-Step Tutorial](https://github.com/Sh1ne111/KMERIA/wiki/Detailed-Step-by-Step-Tutorial)**: A complete walkthrough of the entire KMERIA workflow, from raw reads to association results.
 - **[Post-GWAS Analysis](https://github.com/Sh1ne111/KMERIA/wiki/Post-GWAS-Analysis)**: Guides on mapping associated k-mers and reads.
+- **[Retrieve k-mer dosage](https://github.com/Sh1ne111/KMERIA/wiki/Retrieve-k%E2%80%90mer-dosage-from-the-k%E2%80%90mer-counting-matrices)**: Retrieve k‐mer dosage from the k‐mer counting matrices.
 
 ## <a name="command-overview"></a> Command Overview
 ```
@@ -126,7 +127,7 @@ For detailed, step-by-step instructions, parameter explanations, and advanced us
 Program:  KMERIA - A KMER-based genome-wIde Association testing approach
           for polyploids
 
-Version:  v2.0.1 (r: 2025-10-14)
+Version:  v2.0.1 (2025-10-14)
 Author:   Chen Shuai <chensss1209@gmail.com>
 GitHub:   https://github.com/Sh1ne111/KMERIA
 
@@ -163,12 +164,11 @@ Additional Help:
 #===========================================================================#
 ```
 
-
 ## <a name="misc"></a> Miscellaneous Tools
 
 KMERIA also includes several utility scripts located in the `/bin` and `/scripts` directories:
 
-- `/bin/retrieve`: Get k-mer dosage from filtered k-mer counting matrices.
+- `/bin/retrieve_kmer`: Get k-mer dosage from filtered k-mer counting matrices.
 - `/scripts/calc_gwas_threshold_new.R`: Calculate the GWAS significance threshold.
 - `/scripts/plot_manhattan.R`: Helper script for plotting Manhattan plots.
 
