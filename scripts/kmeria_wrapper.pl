@@ -749,7 +749,7 @@ sub run_convert_step {
     print $fh "    --no-validate \\\n";
     print $fh "    -o $output/sampling.vcf\n\n";
     # remove the temp bimbam file
-    print $fh "rm $output/sampling.bimbam\n\n";
+    # print $fh "rm $output/sampling.bimbam\n\n";
     
     # Convert to PLINK format
     print $fh "# Convert VCF to PLINK binary format\n";
