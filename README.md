@@ -78,8 +78,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 
 
 ## <a name="quick-start"></a> Quick Start
-
-KMERIA provides a wrapper script `kmeria_wrapper.pl` to generate job scripts for the entire pipeline, with support for SLURM, SGE, and PBS schedulers.
+KMERIA provides a wrapper script, kmeria_wrapper.pl, designed to generate job scripts for the entire analysis pipeline, with built-in support for SLURM, SGE, and PBS schedulers. To facilitate the execution of a complete KMERIA analysis, we strongly recommend using this script as the entry point for workflow management.
 
 ```bash
 perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
