@@ -878,8 +878,9 @@ sub run_asso_step {
     print $fh "    -o $output \\\n";
     print $fh "    -t $threads \\\n";
     print $fh "    --verbose \\\n";
+    print $fh "    --bimbam-gzip \\\n";
     if ($use_bimbam_tools) {
-        print $fh "    --bimbam-gzip \\\n";
+#        print $fh "    --bimbam-gzip \\\n";
         print $fh "    --out-precision $output_precision \\\n";
         print $fh "    -s $output/sample.list \\\n";
     }
