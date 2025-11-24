@@ -186,4 +186,4 @@ If you have used KMERIA in your research, please cite below:
 
 > https://github.com/Sh1ne111/KMERIA
 >
-> Chen Shuai, et al., A k-mer-based GWAS approach empowering gene mining in polyploids. (paper preparation)
+> Shuai Chen et al. A k-mer-based GWAS approach empowering gene mining in polyploids, 05 November 2025, PREPRINT (Version 1) available at Research Square [https://doi.org/10.21203/rs.3.rs-7347406/v1]
