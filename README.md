@@ -180,6 +180,44 @@ Usage instructions are available on the [**Wiki**](https://github.com/Sh1ne111/K
 
 For questions or feedback, please contact [Chen Shuai] at [chensss1209@gmail.com].
 
+## FREQUENTLY ASKED QUESTIONS
+```
+Should I use kmeria count or KMC?
+    Use kmeria count (default) for: 
+           - Most standard analyses 
+           - Direct KMERIA pipeline
+integration
+    Use KMC (--use-kmc) for: 
+            - Very large datasets (>100GB per sample) 
+            - When you need strict abundance filtering 
+            - Compatibility with other KMC-based workflows
+    Consider: 
+            - Shorter k-mers: More sensitive, more false positives, less memory 
+            - Longer k-mers: More specific, fewer false positives, more memory
+
+How do I process paired-end reads?
+    Both methods automatically detect and process paired-end files: 
+            - Files matching: sample_R1.fq.gz and sample_R2.fq.gz 
+            - Or: sample_1.fq.gz and sample_2.fq.gz
+
+    The script will: 
+            - kmeria count: Process each file separately (generates multiple output files) 
+            - KMC: Combine both files in a single k-mer database
+
+Can I restart a failed pipeline?
+    Yes! Since each step generates independent job scripts: 
+    1. Identify which step failed (check log files) 
+    2. Fix the issue (add memory, correct input files, etc.) 
+    3. Re-run only that specific step: --step count|kctm|filter|m2b|asso 4. Continue with subsequent steps
+
+How do I speed up association analysis?
+    The association step handles internal parallelism: 
+     - Use --threads to set concurrency (e.g., 64) 
+     - Ensure fast I/O (SSD storage) 
+     - Pre-compute kinship and covariates
+     Choose tool mode with --use-bimbam-tools for bimbamAsso mode.
+```
+
 ## <a name="citation"></a> <span id="citing">Citation</span>
 
 If you have used KMERIA in your research, please cite below:
