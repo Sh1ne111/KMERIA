@@ -183,8 +183,7 @@ For questions or feedback, please contact [Chen Shuai] at [chensss1209@gmail.com
 Should I use kmeria count or KMC?
     Use kmeria count (default) for: 
            - Most standard analyses 
-           - Direct KMERIA pipeline
-integration
+           - Direct KMERIA pipeline integration
     Use KMC (--use-kmc) for: 
             - Very large datasets (>100GB per sample) 
             - When you need strict abundance filtering 
@@ -203,7 +202,8 @@ Can I restart a failed pipeline?
     Yes! Since each step generates independent job scripts: 
     1. Identify which step failed (check log files) 
     2. Fix the issue (add memory, correct input files, etc.) 
-    3. Re-run only that specific step: --step count|kctm|filter|m2b|asso 4. Continue with subsequent steps
+    3. Re-run only that specific step: --step count|kctm|filter|m2b|asso
+    4. Continue with subsequent steps
 
 How do I speed up association analysis?
     The association step handles internal parallelism: 
