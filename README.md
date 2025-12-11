@@ -180,7 +180,7 @@ Usage instructions are available on the [**Wiki**](https://github.com/Sh1ne111/K
 
 For questions or feedback, please contact [Chen Shuai] at [chensss1209@gmail.com].
 
-## FREQUENTLY ASKED QUESTIONS
+## FAQs
 ```
 Should I use kmeria count or KMC?
     Use kmeria count (default) for: 
@@ -191,6 +191,7 @@ integration
             - Very large datasets (>100GB per sample) 
             - When you need strict abundance filtering 
             - Compatibility with other KMC-based workflows
+            - Faster
     Consider: 
             - Shorter k-mers: More sensitive, more false positives, less memory 
             - Longer k-mers: More specific, fewer false positives, more memory
@@ -199,10 +200,6 @@ How do I process paired-end reads?
     Both methods automatically detect and process paired-end files: 
             - Files matching: sample_R1.fq.gz and sample_R2.fq.gz 
             - Or: sample_1.fq.gz and sample_2.fq.gz
-
-    The script will: 
-            - kmeria count: Process each file separately (generates multiple output files) 
-            - KMC: Combine both files in a single k-mer database
 
 Can I restart a failed pipeline?
     Yes! Since each step generates independent job scripts: 
