@@ -91,15 +91,13 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --min-abund 5 \
   --max-abund 1000 \
   --batch-size 2 \
-  # Optional, default: kmeria count
-  --use-kmc \
+  --use-kmc \   # Optional, default: kmeria count
   --kmc-memory 32 \
   --ploidy 4 \
   --depth-file /path/to/sample_depths.txt \
   --pheno /path/to/phenotypes.txt \
   --pheno-col 1 \
-  # Optional: Use built-in 'bimbamAsso' instead of 'gemma'
-  --use-bimbam-tools \
+  --use-bimbam-tools \   # Optional: Use built-in 'bimbamAsso' instead of 'gemma'
   --scheduler slurm \
   --queue hebhcnormal01
 ```
