@@ -442,22 +442,31 @@ sub run_count_step {
                 
                 # Determine output format extension
                 my $output_ext = $text_output ? "txt" : "bin";
+                my $output_file = "$output/${sample}_k${kmer_size}.$output_ext";
+                print $fh "$kmeria_cmd -o $output_file";
+    
+               # Add all input files to the same command
+               foreach my $input_file (@input_files) {
+                   print $fh " $input_file";
+               }
+               print $fh "\n\n";
+
                 
                 # Process each input file
-                foreach my $input_file (@input_files) {
-                    my $file_basename = basename($input_file);
-                    $file_basename =~ s/\.(?:fastq|fq|fasta|fa)(?:\.gz)?$//i;
+               # foreach my $input_file (@input_files) {
+               #     my $file_basename = basename($input_file);
+               #     $file_basename =~ s/\.(?:fastq|fq|fasta|fa)(?:\.gz)?$//i;
                     
-                    print $fh "$kmeria_cmd -o $output/${sample}_${file_basename}_k${kmer_size}.$output_ext $input_file\n";
-                }
+               #     print $fh "$kmeria_cmd -o $output/${sample}_${file_basename}_k${kmer_size}.$output_ext $input_file\n";
+               # }
                 
                 # If multiple files exist (paired-end), merge them if needed
-                if (scalar(@input_files) > 1) {
-                    print $fh "\n# Note: Multiple input files detected for $sample\n";
-                    print $fh "# Consider merging count results if necessary\n\n";
-                } else {
-                    print $fh "\n";
-                }
+               # if (scalar(@input_files) > 1) {
+               #     print $fh "\n# Note: Multiple input files detected for $sample\n";
+               #     print $fh "# Consider merging count results if necessary\n\n";
+               # } else {
+               #     print $fh "\n";
+               # }
                 
                 # For compatibility with kctm step, create a sorted version marker
                 # Note: kmeria count output may need to be converted to KMC format for kctm
