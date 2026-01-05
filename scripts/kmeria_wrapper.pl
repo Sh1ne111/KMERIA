@@ -418,7 +418,7 @@ sub run_count_step {
                 
                 # Sort k-mers (required for kctm)
                 print $fh "# Sort k-mers for matrix construction\n";
-                print $fh "kmc_tools transform $output/${sample}_k${kmer_size} sort $output/${sample}_sort_k${kmer_size}\n\n";
+                print $fh "kmc_tools -t$threads transform $output/${sample}_k${kmer_size} sort $output/${sample}_sort_k${kmer_size}\n\n";
                 
                 # Cleanup temporary files
                 print $fh "# Cleanup temporary files\n";
