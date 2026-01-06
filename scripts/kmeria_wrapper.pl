@@ -501,6 +501,7 @@ sub run_count_step {
 }
 
 
+
 sub run_kctm_step {
     my ($input, $output) = @_;
     
@@ -539,55 +540,107 @@ sub run_kctm_step {
     print $fh "echo 'K-mer Matrix Construction'\n";
     print $fh "echo '========================================'\n\n";
     
-    # ===== CRITICAL FIX: USE SAMPLE ORDER FILE =====
-    print $fh "# Create list of sorted k-mer database files in CORRECT ORDER\n";
-    
-    if (-f $sample_order_file) {
-        print $fh "# Using sample order from: $sample_order_file\n";
-        print $fh "if [ ! -f $sample_order_file ]; then\n";
-        print $fh "    echo 'ERROR: Sample order file not found: $sample_order_file'\n";
+    if ($use_kmc) {
+        # ===== KMC MODE: Use sorted KMC databases =====
+        print $fh "# Using KMC sorted k-mer databases\n";
+        print $fh "# Create list of sorted k-mer database files in CORRECT ORDER\n";
+        
+        if (-f $sample_order_file) {
+            print $fh "# Using sample order from: $sample_order_file\n";
+            print $fh "if [ ! -f $sample_order_file ]; then\n";
+            print $fh "    echo 'ERROR: Sample order file not found: $sample_order_file'\n";
+            print $fh "    exit 1\n";
+            print $fh "fi\n\n";
+            
+            print $fh "# Generate sample list based on original order\n";
+            print $fh "> $output/sample_sort_k${kmer_size}.list\n";
+            print $fh "while IFS= read -r sample; do\n";
+            print $fh "    kmer_file=\"$input/\${sample}_sort_k${kmer_size}\"\n";
+            print $fh "    if [ -f \"\${kmer_file}.kmc_pre\" ] && [ -f \"\${kmer_file}.kmc_suf\" ]; then\n";
+            print $fh "        echo \"\${kmer_file}\" >> $output/sample_sort_k${kmer_size}.list\n";
+            print $fh "    else\n";
+            print $fh "        echo \"WARNING: K-mer files not found for sample: \$sample\"\n";
+            print $fh "        echo \"Expected: \${kmer_file}.kmc_pre and \${kmer_file}.kmc_suf\"\n";
+            print $fh "    fi\n";
+            print $fh "done < $sample_order_file\n\n";
+        } else {
+            print $fh "# WARNING: No sample order file found, using alphabetical order\n";
+            print $fh qq{ls $input/*_sort_k${kmer_size}.kmc_pre | sed "s/\\.kmc_pre//g" | sort > $output/sample_sort_k${kmer_size}.list\n\n};
+        }
+        
+        print $fh "# Check if sample list is not empty\n";
+        print $fh "if [ ! -s $output/sample_sort_k${kmer_size}.list ]; then\n";
+        print $fh "    echo 'ERROR: No sorted k-mer files found in $input'\n";
         print $fh "    exit 1\n";
         print $fh "fi\n\n";
         
-        print $fh "# Generate sample list based on original order\n";
-        print $fh "> $output/sample_sort_k${kmer_size}.list\n";
-        print $fh "while IFS= read -r sample; do\n";
-        print $fh "    kmer_file=\"$input/\${sample}_sort_k${kmer_size}\"\n";
-        print $fh "    if [ -f \"\${kmer_file}.kmc_pre\" ] && [ -f \"\${kmer_file}.kmc_suf\" ]; then\n";
-        print $fh "        echo \"\${kmer_file}\" >> $output/sample_sort_k${kmer_size}.list\n";
-        print $fh "    else\n";
-        print $fh "        echo \"WARNING: K-mer files not found for sample: \$sample\"\n";
-        print $fh "        echo \"Expected: \${kmer_file}.kmc_pre and \${kmer_file}.kmc_suf\"\n";
-        print $fh "    fi\n";
-        print $fh "done < $sample_order_file\n\n";
     } else {
-        print $fh "# WARNING: No sample order file found, using alphabetical order\n";
-        print $fh qq{ls $input/*_sort_k${kmer_size}.kmc_pre | sed "s/\\.kmc_pre//g" | sort > $output/sample_sort_k${kmer_size}.list\n\n};
+        # ===== KMERIA COUNT MODE: Use kmeria count output files =====
+        print $fh "# Using kmeria count output files\n";
+        print $fh "# Create list of k-mer count files in CORRECT ORDER\n";
+        
+        # Determine file extension based on text_output flag
+        my $count_ext = $text_output ? "txt" : "bin";
+        
+        if (-f $sample_order_file) {
+            print $fh "# Using sample order from: $sample_order_file\n";
+            print $fh "if [ ! -f $sample_order_file ]; then\n";
+            print $fh "    echo 'ERROR: Sample order file not found: $sample_order_file'\n";
+            print $fh "    exit 1\n";
+            print $fh "fi\n\n";
+            
+            print $fh "# Generate sample list based on original order\n";
+            print $fh "> $output/sample_k${kmer_size}.list\n";
+            print $fh "while IFS= read -r sample; do\n";
+            print $fh "    kmer_file=\"$input/\${sample}_k${kmer_size}.$count_ext\"\n";
+            print $fh "    if [ -f \"\${kmer_file}\" ]; then\n";
+            print $fh "        echo \"\${kmer_file}\" >> $output/sample_k${kmer_size}.list\n";
+            print $fh "    else\n";
+            print $fh "        echo \"WARNING: K-mer count file not found for sample: \$sample\"\n";
+            print $fh "        echo \"Expected: \${kmer_file}\"\n";
+            print $fh "    fi\n";
+            print $fh "done < $sample_order_file\n\n";
+        } else {
+            print $fh "# WARNING: No sample order file found, using alphabetical order\n";
+            print $fh qq{ls $input/*_k${kmer_size}.$count_ext | sort > $output/sample_k${kmer_size}.list\n\n};
+        }
+        
+        print $fh "# Check if sample list is not empty\n";
+        print $fh "if [ ! -s $output/sample_k${kmer_size}.list ]; then\n";
+        print $fh "    echo 'ERROR: No k-mer count files found in $input'\n";
+        print $fh "    exit 1\n";
+        print $fh "fi\n\n";
     }
     
-    print $fh "# Check if sample list is not empty\n";
-    print $fh "if [ ! -s $output/sample_sort_k${kmer_size}.list ]; then\n";
-    print $fh "    echo 'ERROR: No sorted k-mer files found in $input'\n";
-    print $fh "    exit 1\n";
-    print $fh "fi\n\n";
-    
-    print $fh "echo \"Found \$(wc -l < $output/sample_sort_k${kmer_size}.list) samples for matrix construction\"\n\n";
+    print $fh "echo \"Found \$(wc -l < $output/sample_";
+    print $fh $use_kmc ? "sort_" : "";
+    print $fh "k${kmer_size}.list) samples for matrix construction\"\n\n";
     
     # ===== PRINT SAMPLE LIST FOR VERIFICATION =====
     print $fh "# Print sample list for verification\n";
     print $fh "echo \"Sample order:\"\n";
-    print $fh "cat $output/sample_sort_k${kmer_size}.list\n";
+    print $fh "cat $output/sample_";
+    print $fh $use_kmc ? "sort_" : "";
+    print $fh "k${kmer_size}.list\n";
     print $fh "echo \"\"\n\n";
     
     # Run kmeria kctm
     print $fh "# Build k-mer count matrix\n";
-    print $fh "kmeria kctm -i $output/sample_sort_k${kmer_size}.list \\\n";
+    print $fh "kmeria kctm -i $output/sample_";
+    print $fh $use_kmc ? "sort_" : "";
+    print $fh "k${kmer_size}.list \\\n";
     print $fh "    -o $output/sample_k${kmer_size} \\\n";
     print $fh "    -v --no-header -b $kctm_batch\n\n";
     
     # ===== SAVE KCTM SAMPLE ORDER =====
     print $fh "# Save sample order used in kctm for verification\n";
-    print $fh "cat $output/sample_sort_k${kmer_size}.list | xargs -n1 basename | sed 's/_sort_k${kmer_size}\$//' > $output/kctm_sample_order.txt\n\n";
+    print $fh "cat $output/sample_";
+    print $fh $use_kmc ? "sort_" : "";
+    print $fh "k${kmer_size}.list | xargs -n1 basename | sed 's/";
+    print $fh $use_kmc ? "_sort" : "";
+    print $fh "_k${kmer_size}";
+    print $fh $use_kmc ? "\$//' > " : "\\.[^\\.]*\$//' > ";
+    print $fh "$output/kctm_sample_order.txt\n\n";
     
     print $fh "echo 'K-mer matrix construction completed successfully'\n";
     print $fh "echo 'Sample order saved to: $output/kctm_sample_order.txt'\n";
@@ -595,7 +648,8 @@ sub run_kctm_step {
     close($fh);
     chmod 0755, $job_script;
     
-    print "Generated script: $job_script\n";
+    my $count_method = $use_kmc ? "KMC" : "kmeria count";
+    print "Generated script: $job_script (using $count_method output)\n";
     print "K-mer matrix building job script has been generated.\n";
     
     if (-f $sample_order_file) {
