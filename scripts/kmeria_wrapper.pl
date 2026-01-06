@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Author: Chen Shuai (chensss1209@gmail.com)
-#
+# DEBUG (2026-01-05): Fix the bug of 'kmeria count' in run_kctm_steps .
 # DEBUG (2025-11-11): Fixing the covariate format for the bimbamAsso analysis .
 # DEBUG (2025-11-09): Removed the temporary BIMBAM file after the PCA and kinship calculations were completed.
 #
