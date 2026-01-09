@@ -56,7 +56,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
    git clone https://github.com/Sh1ne111/KMERIA.git
 
    # To avoid GNU C++ Runtime Library conflicts, you can create a conda virtual environment to ensure all dependent libraries are installed correctly.
-   conda env create -f kmeria_env.yml
+   conda env create -f kmeria_env.yaml
    conda activate kmeriaenv 
 
    # htslib
