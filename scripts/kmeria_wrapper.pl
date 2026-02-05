@@ -439,6 +439,8 @@ sub run_count_step {
                 $kmeria_cmd .= " -T" if $text_output;
                 $kmeria_cmd .= " -p $partition_bits" if defined $partition_bits;
                 $kmeria_cmd .= " -c" if $compress_homopolymers;
+                $kmeria_cmd .= " -m $min_abundance" if defined $min_abundance;
+                $kmeria_cmd .= " -M $max_abundance" if defined $max_abundance;
                 
                 # Determine output format extension
                 my $output_ext = $text_output ? "txt" : "bin";
