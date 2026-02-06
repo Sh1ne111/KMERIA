@@ -35,6 +35,12 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 
 ## Recent updates
 
+* KMERIA Version 2.0.3 (2026.02.06)
+  - Fix the bug in parameter parsing of `kmeria count`
+
+* KMERIA Version 2.0.2 (2026.02.05)
+  - Introduced new parameters in `kmeria count` to control the output range of k-mer abundance, allowing for more efficient noise reduction.
+
 * KMERIA Version 2.0.1 (2025.10.30):
   - K-mer matrix construction is now more efficient and consumes fewer resources;
   - Updated filter step to use new compressed output format;
