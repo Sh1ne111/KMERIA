@@ -413,7 +413,7 @@ sub run_count_step {
                 print $fh "EOF\n\n";
                 
                 # Run KMC with the file list
-                print $fh "kmc -k$kmer_size -t$threads -m$kmc_memory -b -ci$min_abundance -cs$max_abundance \\\n";
+                print $fh "kmc -k$kmer_size -t$threads -m$kmc_memory -ci$min_abundance -cs$max_abundance \\\n";
                 print $fh "    \@$output/${sample}_fastq_list.txt $output/${sample}_k${kmer_size} $output/$sample\n\n";
                 
                 # Sort k-mers (required for kctm)
