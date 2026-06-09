@@ -166,7 +166,8 @@ Additional Help:
     Visit https://github.com/Sh1ne111/KMERIA for documentation
 
 #===========================================================================#
-#  Citation: If you use KMERIA, please cite our paper at [Journal/DOI]      #
+#  Citation: If you use KMERIA, please cite our paper at                    #
+#      [https://doi.org/10.1038/s41588-026-02641-8]                         #
 #===========================================================================#
 ```
 
