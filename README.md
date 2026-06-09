@@ -221,8 +221,6 @@ How do I speed up association analysis?
 
 ## <a name="citation"></a> <span id="citing">Citation</span>
 
-If you have used KMERIA in your research, please cite below:
+If you have used KMERIA in your research, please cite our paper published in Nature Genetics:
 
-> https://github.com/Sh1ne111/KMERIA
->
-> Shuai Chen et al. A k-mer-based GWAS approach empowering gene mining in polyploids, 05 November 2025, PREPRINT (Version 1) available at Research Square [https://doi.org/10.21203/rs.3.rs-7347406/v1]
+> Chen Shuai et al. A k-mer-based GWAS approach empowering gene mining in polyploids, Nature Genetics (2026). doi:[https://doi.org/10.1038/s41588-026-02641-8]
