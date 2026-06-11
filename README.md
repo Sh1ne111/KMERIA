@@ -34,7 +34,9 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 - **Facilitated Genotype Identification:** KMERIA reduce the complexity of identifying genotypes in polyploids, facilitating faster and more efficient association analyses.
 
 ## Recent updates
-
+* KMERIA Version 2.0.4 (2026.06.12)
+  - Primarily focusing on hash function adjustments and memory usage optimization for 'kmeria count'. Additionally, the current version of `kmeria count` has extended the supported k‑mer size range to 2–63. Larger k‑mers are mainly intended for standard k‑mer analysis of genomic data and are not recommended for downstream kmer-based GWAS. If k‑mers are to be used for GWAS analysis, the k‑mer size should not exceed 31.
+  
 * KMERIA Version 2.0.3 (2026.02.06)
   - Fix the bug in parameter parsing of `kmeria count`
 
@@ -53,7 +55,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 
 - C/C++ compiler
 - GNU make 
-- Linux system
+- Linux OS
 
 ## <a name="install"></a> Installation
 ```bash
