@@ -185,7 +185,7 @@ Usage instructions are available on the [**Wiki**](https://github.com/Sh1ne111/K
 
 ## <a name="contact"></a> Contact
 
-For questions or feedback, please contact [Chen Shuai] at [chensss1209@gmail.com].
+If you have any questions or feedback, you can reach [Chen Shuai] via email at [chensss1209@gmail.com] or submit an [issue](https://github.com/Sh1ne111/KMERIA/issues) on GitHub.
 
 ## FAQs
 ```
