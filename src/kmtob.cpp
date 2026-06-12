@@ -1163,7 +1163,7 @@ void display_bimbam_help_message(const char* program_name) {
 #--------------------------------------------------------------------------------------------------------------#
 #
 # @Prog:              K-mer Matrix to BIMBAM Converter
-# @Version:           v3.0.0
+# @Version:           v2.0.4
 #
 # Usage: 
 #             )" << program_name << R"( [options]
