@@ -135,7 +135,7 @@ For detailed, step-by-step instructions, parameter explanations, and advanced us
 Program:  KMERIA - A KMER-based genome-wIde Association testing approach
           for polyploids
 
-Version:  v2.0.1 (2025-10-14)
+Version:  v2.0.4 (2026-06-12)
 Author:   Chen Shuai <chensss1209@gmail.com>
 GitHub:   https://github.com/Sh1ne111/KMERIA
 
