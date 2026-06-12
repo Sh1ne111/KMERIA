@@ -12,7 +12,7 @@
 - [Prerequisites](#prere)
 - [Installation](#install)
 - [Getting Started](#started)
-  - [KMERIA pipeline (easy mode)](https://github.com/Sh1ne111/KMERIA/wiki/Pipeline-(Easy-Mode))
+  - [KMERIA workflow (easy mode)](https://github.com/Sh1ne111/KMERIA/wiki/Pipeline-(Easy-Mode))
   - [KMERIA overview (detailed steps)](https://github.com/Sh1ne111/KMERIA/wiki/Detailed-Step-by-Step-Tutorial))
 - [Miscellaneous](#misc)
 - [Contact](#contact)
@@ -64,7 +64,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
    git clone https://github.com/Sh1ne111/KMERIA.git
 
    # To avoid GNU C++ Runtime Library conflicts, you can create a conda virtual environment to ensure all dependent libraries are installed correctly.
-   conda env create -f kmeria_env.yaml
+   conda env create -f kmeria_env.yaml  # It's recommended to use mamba or micromamba, which can be faster when creating environments. 
    conda activate kmeriaenv 
 
    # htslib
@@ -80,9 +80,9 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 
    
    # For source code installations
- #  cd /your_path/KEMRIA/
- #  make && make install
- #  make clean
+   cd /your_path/KEMRIA/
+   make && make install
+   make clean
 ```
 
 
