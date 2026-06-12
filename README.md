@@ -49,7 +49,7 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
   - Enhanced m2b step with BGZF compression and statistics;
   - Updated the association step to use our newly implemented Association tool **bimbamAsso**
 
-* KMERIA Version 0.0.1 (2024.10.14) is no longer be maintained
+* KMERIA Version 1.0.1 (2024.10.14) is no longer be maintained
 
 ## <a name="prere"></a> Prerequisites
 
