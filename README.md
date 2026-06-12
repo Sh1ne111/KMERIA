@@ -58,33 +58,43 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 - Linux OS
 
 ## <a name="install"></a> Installation
+##### Option 1:  Install pre‑built binaries
+
 ```bash
-   
-   # Clone the KMERIA repository:
-   git clone https://github.com/Sh1ne111/KMERIA.git
-
-   # To avoid GNU C++ Runtime Library conflicts, you can create a conda virtual environment to ensure all dependent libraries are installed correctly.
-   conda env create -f kmeria_env.yaml  # It's recommended to use mamba or micromamba, which can be faster when creating environments. 
-   conda activate kmeriaenv 
-
-   # htslib
-   export LD_LIBRARY_PATH=/your_path/KMERIA/lib:$LD_LIBRARY_PATH
-
-   # Change Permissions
-   chmod 755 /your_path/KMERIA/bin/*
-   chmod 755 /your_path/KMERIA/external_tools/*
-   chmod 755 /your_path/KMERIA/bimbamAsso/*
-
-   #Add PATH environment
-   export PATH=/your_path/KMERIA/bin:/your_path/KMERIA/bimbamAsso:/your_path/KMERIA/external_tools:$PATH
-
-   
-   # For source code installations
-   cd /your_path/KEMRIA/
-   make && make install
-   make clean
+# 1. Clone the KMERIA repository
+git clone https://github.com/Sh1ne111/KMERIA.git
+# 2. (Recommended) Create a Conda virtual environment to avoid GNU C++ Runtime Library conflicts
+#    Using mamba or micromamba can significantly speed up environment creation.
+conda env create -f kmeria_env.yaml   # or: mamba env create -f kmeria_env.yaml
+conda activate kmeriaenv
+# 3. Set the library path for htslib (adjust the path to your actual KMERIA directory)
+export LD_LIBRARY_PATH=/your_path/KMERIA/lib:$LD_LIBRARY_PATH
+# 4. Grant execute permissions to binary files
+chmod 755 /your_path/KMERIA/bin/* /your_path/KMERIA/external_tools/* /your_path/KMERIA/bimbamAsso/*
+# 5. Add KMERIA directories to your PATH environment variable
+export PATH=/your_path/KMERIA/bin:/your_path/KMERIA/bimbamAsso:/your_path/KMERIA/external_tools:$PATH
 ```
 
+##### Option 2: Install from the source codes
+If you prefer or need to compile KMERIA from source, start with the same `conda` environment setup as above:
+
+```bash
+# Complete the environment preparation
+git clone https://github.com/Sh1ne111/KMERIA.git
+conda env create -f kmeria_env.yaml   # or use mamba / micromamba
+conda activate kmeriaenv
+# htslib
+export LD_LIBRARY_PATH=/your_path/KMERIA/lib:$LD_LIBRARY_PATH
+# Navigate to the KMERIA directory
+cd /your_path/KMERIA
+make && make install
+# (Optional) Clean up build artifacts
+make clean
+# Change Permissions
+chmod 755 /your_path/KMERIA/bin/* /your_path/KMERIA/external_tools/* /your_path/KMERIA/bimbamAsso/*
+#Add KMERIA directories to your PATH environment variable
+export PATH=/your_path/KMERIA/bin:/your_path/KMERIA/bimbamAsso:/your_path/KMERIA/external_tools:$PATH
+```
 
 ## <a name="quick-start"></a> Quick Start
 KMERIA provides a wrapper script, kmeria_wrapper.pl, designed to generate job scripts for the entire analysis pipeline, with built-in support for SLURM, SGE, and PBS schedulers. To facilitate the execution of a complete KMERIA analysis, we strongly recommend using this script as the entry point for workflow management.
