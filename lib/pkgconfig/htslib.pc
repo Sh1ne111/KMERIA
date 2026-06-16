@@ -1,15 +1,15 @@
-includedir=/public/home/agis_chenshuai/software/htslib/include
-libdir=/public/home/agis_chenshuai/software/htslib/lib
+includedir=/public/home/chenshuai/software/htslib/include
+libdir=/public/home/chenshuai/software/htslib/lib
 
 # Flags and libraries needed when linking against a static libhts.a
 # (used by manual and semi-manual pkg-config(1)-style enquiries).
-static_ldflags=-L/public/software/compiler/gcc-12.2.0/lib
+static_ldflags=-L/public/home/chenshuai/software/bifrost/build/lib
 static_libs=-lpthread -lz -lm -lbz2 -llzma
 
 Name: htslib
 Description: C library for high-throughput sequencing data formats
-Version: 1.20-15-gb204d55
+Version: 1.20-15-gb204d55c-dirty
 Cflags: -I${includedir}
 Libs: -L${libdir} -lhts
-Libs.private: -L${libdir} -L/public/software/compiler/gcc-12.2.0/lib -lbz2 -lhts -lm -lpthread
+Libs.private: -L${libdir} -L/public/home/chenshuai/software/bifrost/build/lib -lbz2 -lhts -lm -lpthread
 Requires.private: zlib  liblzma
