@@ -199,7 +199,7 @@ If you have any questions or feedback, you can reach [Chen Shuai] via email at [
 
 ## FAQs
 ```
-Should I use kmeria count or KMC?
+（1）Should I use kmeria count or KMC?
     Use kmeria count (default) for: 
            - Most standard analyses 
            - Direct KMERIA pipeline integration
@@ -212,19 +212,24 @@ Should I use kmeria count or KMC?
             - Shorter k-mers: More sensitive, more false positives, less memory 
             - Longer k-mers: More specific, fewer false positives, more memory
 
-How do I process paired-end reads?
+（2）How do I correct k‑mer depth for read length?
+The effective k‑mer coverage depth is not equal to the nominal sequencing depth, because reads lose k‑mers near their ends. The correction formula is:
+    k‑mer depth = sequencing depth × (L − k + 1) / L
+where L is the read length and k is the k‑mer size (e.g., 31 for k-mer size). For example, with 150‑bp paired‑end reads and 31‑mers, the factor is (150−31+1)/150 = 0.8, so the k‑mer depth is only 80 % of the sequencing depth. This adjustment is critical for setting appropriate k‑mer count thresholds (e.g., minimum depth for reliable k‑mers).
+
+（3）How do I process paired-end reads?
     Both methods automatically detect and process paired-end files: 
             - Files matching: sample_R1.fq.gz and sample_R2.fq.gz 
             - Or: sample_1.fq.gz and sample_2.fq.gz
 
-Can I restart a failed pipeline?
+（4）Can I restart a failed pipeline?
     Yes! Since each step generates independent job scripts: 
     1. Identify which step failed (check log files) 
     2. Fix the issue (add memory, correct input files, etc.) 
     3. Re-run only that specific step: --step count|kctm|filter|m2b|asso
     4. Continue with subsequent steps
 
-How do I speed up association analysis?
+（5）How do I speed up association analysis?
     The association step handles internal parallelism: 
      - Use --threads to set concurrency (e.g., 64) 
      - Ensure fast I/O (SSD storage) 
