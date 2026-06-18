@@ -112,7 +112,7 @@ perl /KMERIA/scripts/kmeria_wrapper.pl --step all \
   --use-kmc \   # Optional, default: kmeria count
   --kmc-memory 32 \
   --ploidy 4 \
-  --depth-file /path/to/sample_depths.txt \
+  --depth-file /path/to/sample_depths.txt \   # k‑mer depth = sequencing depth × (L – k + 1) / L, where k is the k‑mer size and L is the read length.
   --pheno /path/to/phenotypes.txt \
   --pheno-col 1 \
   --use-bimbam-tools \   # Optional: Use built-in 'bimbamAsso' instead of 'gemma'
