@@ -1,0 +1,6 @@
+__pycache__/
+.venv/
+dist/
+tests/pg/assoc/
+tests/pg/genome.fa*
+tests/pg/genes.gff3

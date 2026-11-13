@@ -1,0 +1,95 @@
+
+#!/usr/bin/env bash
+# ====================================================================
+#  KMERIA 分析流程一键部署脚本
+#  项目:   @@PROJECT@@
+#  生成于: @@DATE@@  (easyKMERIA)
+#
+#  用法:   bash deploy_kmeria.sh
+#  做什么: 建目录 -> 写入输入文件 -> 检查软件和数据 -> 调用
+#          kmeria_wrapper.pl 生成作业脚本 -> 预览提交顺序
+#  说明:   本脚本不会提交任何作业, 确认预览无误后再运行
+#          bash submit_chain.sh --go
+# ====================================================================
+set -euo pipefail
+
+# ---------- 1. 路径与软件环境 ----------
+KMERIA_HOME="@@KMERIA_HOME@@"
+PROJECT_DIR="@@PROJECT_DIR@@"
+FASTQ_DIR="@@FASTQ_DIR@@"
+OUT_DIR="$PROJECT_DIR/results"
+
+@@ENV_BLOCK@@
+export LD_LIBRARY_PATH="$KMERIA_HOME/lib:${LD_LIBRARY_PATH:-}"
+export PATH="$KMERIA_HOME/bin:$KMERIA_HOME/bimbamAsso:$KMERIA_HOME/external_tools:$PATH"
+
+# ---------- 2. 建目录, 写入输入文件 ----------
+mkdir -p "$PROJECT_DIR" "$OUT_DIR"
+cd "$PROJECT_DIR"
+
+cat > sample.list <<'KMERIA_SAMPLES_EOF'
+@@SAMPLE_LIST@@
+KMERIA_SAMPLES_EOF
+
+cat > sample_depth.tsv <<'KMERIA_DEPTH_EOF'
+@@DEPTH_FILE@@
+KMERIA_DEPTH_EOF
+
+cat > phenotypes.txt <<'KMERIA_PHENO_EOF'
+@@PHENO_FILE@@
+KMERIA_PHENO_EOF
+echo ">>> 已写入 sample.list / sample_depth.tsv / phenotypes.txt"
+@@LINK_BLOCK@@
+# ---------- 3. 运行前检查 ----------
+echo ">>> 检查软件@@CHECK_DATA_LABEL@@"
+fail=0
+for cmd in perl kmeria; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "  [缺失] 找不到命令: $cmd"; fail=1
+  fi
+done
+if [ ! -f "$KMERIA_HOME/scripts/kmeria_wrapper.pl" ]; then
+  echo "  [缺失] $KMERIA_HOME/scripts/kmeria_wrapper.pl (请检查 KMERIA 安装路径)"; fail=1
+fi
+for cmd in @@EXTRA_CMDS@@; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "  [提示] 暂时没找到命令: $cmd (对应步骤运行时需要它)"
+  fi
+done
+@@DATA_CHECK@@
+if [ "$fail" -ne 0 ]; then
+  echo "检查没有通过, 请先处理上面标有 [缺失] 的项目后再运行。"
+  exit 1
+fi
+echo "  检查通过"
+
+# ---------- 4. 生成作业脚本 ----------
+echo ">>> 调用 kmeria_wrapper.pl 生成作业脚本"
+@@WRAPPER_CMD@@
+
+# ---------- 4b. 让每个作业脚本在计算节点上自己加载软件环境 ----------
+# 作业在计算节点上运行, 不一定继承提交时的环境 (例如 kmc 在 conda/micromamba 环境里就会报 command not found)。
+# 下面写出 easykmeria_env.sh, 并在每个作业脚本的第一条命令前加一行 source (原有内容不变, 重复运行不会重复添加)。
+ENV_FILE="$PROJECT_DIR/easykmeria_env.sh"
+cat > "$ENV_FILE" <<'KMERIA_ENV_EOF'
+@@JOB_ENV@@
+KMERIA_ENV_EOF
+patched=0
+while IFS= read -r f; do
+  if ! grep -q 'easykmeria_env.sh' "$f"; then
+    awk -v line="source \"$ENV_FILE\"" '!d && $0 !~ /^[[:space:]]*(#|$)/ {print line; d=1} {print} END{if(!d) print line}' "$f" > "$f.easytmp" && cat "$f.easytmp" > "$f" && rm -f "$f.easytmp"
+    patched=$((patched+1))
+  fi
+done < <(find "$OUT_DIR" -mindepth 2 -maxdepth 3 -type f \( -name '*.sh' -o -name '*.sbatch' -o -name '*.pbs' -o -name '*.qsub' -o -name '*.job' \) | sort)
+echo "  已给 $patched 个作业脚本加上环境加载 (source $ENV_FILE)"
+
+# ---------- 5. 写出提交脚本并预览 ----------
+cat > submit_chain.sh <<'KMERIA_SUBMIT_EOF'
+@@SUBMIT_SCRIPT@@
+KMERIA_SUBMIT_EOF
+chmod +x submit_chain.sh
+
+echo ">>> 预览将要提交的作业 (还没有提交)"
+bash submit_chain.sh
+echo
+echo "确认无误后提交:  cd \"$PROJECT_DIR\" && bash submit_chain.sh --go"

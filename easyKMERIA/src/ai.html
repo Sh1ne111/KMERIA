@@ -1,0 +1,45 @@
+<section class="view" id="v-ai" hidden>
+  <div class="pagehead">
+    <div>
+      <p class="eyebrow">AI</p>
+      <h1>AI 设置</h1>
+      <p class="lede">接入 DeepSeek 后，曼哈顿图的配色可以用一句话生成。请求只包含你写的配色描述，不会发送任何基因组或表型数据。</p>
+    </div>
+  </div>
+  <div class="callout" id="aiStatic" hidden>
+    <b>这里需要运行 easyKMERIA 程序。</b>API Key 只能保存在本机程序里，网页本身不会保存它。运行 <code>python app.py</code> 后即可设置。
+  </div>
+  <div class="clusters">
+    <section class="card cl-card">
+      <div class="cl-top"><h2>DeepSeek</h2><span class="chip" id="aiChip">未设置</span></div>
+      <p class="mono muted" id="aiUrl">https://api.deepseek.com</p>
+      <div class="kv">
+        <div><span class="lab">API Key</span><span id="aiKeyState">未保存</span></div>
+        <div><span class="lab">模型</span><span id="aiModel">deepseek-chat</span></div>
+      </div>
+      <div class="cl-actions"><button type="button" class="btn" id="btnAiEdit">设置</button><button type="button" class="btn" id="btnAiTest">测试连接</button></div>
+      <p class="hint" id="aiTestMsg" role="status"></p>
+    </section>
+    <section class="card cl-card">
+      <div class="cl-top"><h2>数据存放位置</h2></div>
+      <p class="muted">连接信息和 API Key 加密后保存在这个目录，只有本机的当前用户能读。</p>
+      <p class="mono" id="dataDir">未连接到程序</p>
+    </section>
+  </div>
+</section>
+
+<div class="modal" id="aiModal" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="aiTitle">
+    <div class="dlg-h"><div><p class="eyebrow">AI</p><h2 id="aiTitle">DeepSeek 设置</h2></div><button type="button" class="x" data-close aria-label="关闭">×</button></div>
+    <form class="dlg-b" id="aiForm" autocomplete="off" onsubmit="return false">
+      <div class="field"><label for="ai_key">API Key</label><input type="password" id="ai_key" autocomplete="new-password" spellcheck="false">
+        <span class="hint" id="ai_keyHint"></span></div>
+      <div class="field sp"><label for="ai_base">Base URL</label><input type="text" id="ai_base" spellcheck="false"></div>
+      <div class="field sp"><label for="ai_model">模型</label><input type="text" id="ai_model" spellcheck="false"></div>
+      <div class="field sp"><label for="ai_ca">CA 证书文件（可选）</label><input type="text" id="ai_ca" spellcheck="false" placeholder="/Users/你/certs/school-ca.pem">
+        <span class="hint">提示“证书校验失败”时才需要。校园网或公司网络会替换 HTTPS 证书，向网络管理员要根证书（PEM 格式），或从浏览器里导出，把它在电脑上的路径填到这里。</span></div>
+      <p class="form-err" id="ai_err" role="alert" hidden></p>
+      <div class="dlg-f"><button type="button" class="btn" id="ai_clear" hidden>清除 Key</button><span class="grow"></span><button type="submit" class="btn primary" id="ai_save">保存</button></div>
+    </form>
+  </div>
+</div>

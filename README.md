@@ -14,6 +14,7 @@
 - [Getting Started](#started)
   - [KMERIA workflow (easy mode)](https://github.com/Sh1ne111/KMERIA/wiki/Pipeline-(Easy-Mode))
   - [KMERIA overview (detailed steps)](https://github.com/Sh1ne111/KMERIA/wiki/Detailed-Step-by-Step-Tutorial)
+- [easyKMERIA (graphical assistant)](#easykmeria)
 - [Miscellaneous](#misc)
 - [Contact](#contact)
 - [Citation](#citing)
@@ -34,6 +35,9 @@ This repository contains an implementation of a k-mer-based method for Genome-Wi
 - **Facilitated Genotype Identification:** KMERIA reduce the complexity of identifying genotypes in polyploids, facilitating faster and more efficient association analyses.
 
 ## Recent updates
+* easyKMERIA 1.0.0 (2026.11.13)
+  - New: a graphical assistant in [`easyKMERIA/`](easyKMERIA) that generates the pipeline scripts, submits jobs to your cluster, runs Post-GWAS (BLAST localization and Manhattan plot) and, optionally, uses DeepSeek to fill forms, diagnose logs and adjust plots. English and Chinese interface. See [easyKMERIA](#easykmeria).
+
 * KMERIA Version 2.0.4 (2026.06.12)
   - Primarily focusing on hash function adjustments and memory usage optimization for 'kmeria count'. Additionally, the current version of `kmeria count` has extended the supported k‑mer size range to 2–63. Larger k‑mers are mainly intended for standard k‑mer analysis of genomic data and are not recommended for downstream kmer-based GWAS. If k‑mers are to be used for GWAS analysis, the k‑mer size should not exceed 31.
   
@@ -128,6 +132,23 @@ For detailed, step-by-step instructions, parameter explanations, and advanced us
 - **[Detailed Step-by-Step Tutorial](https://github.com/Sh1ne111/KMERIA/wiki/Detailed-Step-by-Step-Tutorial)**: A complete walkthrough of the entire KMERIA workflow, from raw reads to association results.
 - **[Post-GWAS Analysis](https://github.com/Sh1ne111/KMERIA/wiki/Post-GWAS-Analysis)**: Guides on mapping associated k-mers and reads.
 - **[Retrieve k-mer dosage](https://github.com/Sh1ne111/KMERIA/wiki/Retrieve-k%E2%80%90mer-dosage-from-the-k%E2%80%90mer-counting-matrices)**: Retrieve k‐mer dosage from the k‐mer counting matrices.
+
+## <a name="easykmeria"></a> easyKMERIA: graphical assistant
+
+Prefer a browser to a terminal? [**easyKMERIA**](easyKMERIA) is a small local web app (Python, English/中文 interface) for the whole workflow above:
+
+- fills in sample names, data paths and phenotypes and writes the `kmeria_wrapper.pl` pipeline scripts, with a checklist that catches common mistakes;
+- logs in to your own SLURM/SGE/PBS cluster over SSH, uploads and submits the jobs in dependency order, and shows job status and logs;
+- maps significant k-mers to a reference genome (BLAST) and draws a Manhattan plot, following the [Post-GWAS](https://github.com/Sh1ne111/KMERIA/wiki/Post-GWAS-Analysis) workflow;
+- optionally uses DeepSeek to fill the form from one sentence, diagnose failed jobs and change plot parameters ("smaller points, 300 dpi PNG, label the top 10").
+
+<p align="center"><img src="easyKMERIA/docs/images/pipeline-en.png" alt="easyKMERIA pipeline page" width="48%"> <img src="easyKMERIA/docs/images/postgwas-en.png" alt="easyKMERIA Post-GWAS page" width="48%"></p>
+
+```bash
+cd easyKMERIA && ./start.sh      # Windows: start.bat; then open http://127.0.0.1:8765
+```
+
+It runs on your own computer; nothing is installed on the cluster. See the [easyKMERIA README](easyKMERIA/README.md) and the [user guide](easyKMERIA/docs/USER_GUIDE.md) ([中文](easyKMERIA/docs/USER_GUIDE.zh-CN.md)).
 
 ## <a name="command-overview"></a> Command Overview
 ```

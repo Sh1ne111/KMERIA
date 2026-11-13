@@ -1,0 +1,73 @@
+<section class="view" id="v-home">
+  <div class="hero">
+    <div class="hero-text">
+      <p class="eyebrow">KMERIA v2.0.4 · 多倍体 k-mer GWAS</p>
+      <h1>easyKMERIA</h1>
+      <p class="lede">不用记命令行。填好样本、数据路径和表型，就能得到可以直接提交的 KMERIA 全流程脚本，再用同一个页面登录服务器、提交作业，并把显著 k-mer 定位到基因组、画出曼哈顿图。DeepSeek 可以帮你填表、读日志，也能按一句话调整图的样式。</p>
+      <div class="hero-actions">
+        <a class="btn primary big" href="#generate">开始生成流程</a>
+        <a class="btn big" href="#clusters">连接我的服务器</a>
+      </div>
+      <div class="ribbon" aria-hidden="true">
+        <div class="seq" id="ribbon"></div>
+        <div class="cap">31-mer · 推荐的 k-mer 长度</div>
+      </div>
+    </div>
+    <figure class="plate">
+      <div class="plate-img"><img src="@@IMG_ABSTRACT@@" alt="KMERIA 的核心思想：一个碱基突变会改变包含它的 k-mer 的计数" width="520" height="748"></div>
+      <figcaption>KMERIA 的核心思想：一个碱基突变，会让包含它的 k-mer 计数发生变化，GWAS 就在这些 k-mer 上做。图来自 KMERIA 项目仓库。</figcaption>
+    </figure>
+  </div>
+
+  <section class="card flow">
+    <h2>从原始数据到曼哈顿图</h2>
+    <ol class="stations">
+      <li><a href="#generate"><b>count</b><span>统计每个样本的 k-mer</span></a></li>
+      <li><a href="#generate"><b>kctm</b><span>合并成 k-mer 矩阵</span></a></li>
+      <li><a href="#generate"><b>filter</b><span>过滤低频 k-mer</span></a></li>
+      <li><a href="#generate"><b>m2b</b><span>转成 BIMBAM 格式</span></a></li>
+      <li><a href="#generate"><b>asso</b><span>关联分析</span></a></li>
+      <li class="ext"><a href="#postgwas"><b>locate</b><span>BLAST 定位到基因组</span></a></li>
+      <li class="ext"><a href="#postgwas"><b>plot</b><span>曼哈顿图</span></a></li>
+    </ol>
+    <div class="st-groups"><div class="g-main">KMERIA 主流程：在“流程生成”里一次写好</div><div class="g-ext">Post-GWAS：显著 k-mer 定位与作图</div></div>
+  </section>
+
+  <div class="callout" id="staticNotice" hidden>
+    <b>现在是只读预览。</b>流程生成和 Post-GWAS 的脚本生成、曼哈顿图预览都能正常使用；登录服务器、一键提交作业和 DeepSeek 配色需要在你自己的电脑或实验室服务器上运行 easyKMERIA 程序（<code>python app.py</code>）。
+  </div>
+
+  <div class="cols">
+    <section class="card ref">
+      <p class="eyebrow">关于 KMERIA</p>
+      <h2>软件、文档和论文</h2>
+      <ul class="links">
+        <li><a class="link-main" href="https://github.com/Sh1ne111/KMERIA" target="_blank" rel="noopener">github.com/Sh1ne111/KMERIA</a><span class="hint">源代码、安装说明和更新记录</span></li>
+        <li><a class="link-main" href="https://github.com/Sh1ne111/KMERIA/wiki" target="_blank" rel="noopener">KMERIA Wiki</a><span class="hint">流程参数、分步教程、Post-GWAS 说明</span></li>
+        <li><a class="link-main" href="https://doi.org/10.1038/s41588-026-02641-8" target="_blank" rel="noopener">Nature Genetics 论文</a><span class="hint">doi:10.1038/s41588-026-02641-8</span></li>
+        <li><a class="link-main" href="https://doi.org/10.5281/zenodo.20117337" target="_blank" rel="noopener">Zenodo 存档</a><span class="hint">doi:10.5281/zenodo.20117337，论文对应的程序版本</span></li>
+      </ul>
+    </section>
+    <section class="card star">
+      <p class="eyebrow">支持开源</p>
+      <h2>觉得好用，请给 KMERIA 点个 Star</h2>
+      <p class="muted">KMERIA 由作者团队免费开源维护。在 GitHub 页面右上角点一下 Star，是对开发最直接的鼓励，也能让更多做多倍体研究的同行看到它。</p>
+      <a class="btn primary big" href="https://github.com/Sh1ne111/KMERIA" target="_blank" rel="noopener">去 GitHub 点 Star ★</a>
+      <div class="cite">
+        <span class="lab">用到了 KMERIA，请引用论文</span>
+        <p class="cite-text" id="citeText">Chen Shuai et al. A k-mer-based GWAS approach empowering gene mining in polyploids. <i>Nature Genetics</i> (2026). doi:10.1038/s41588-026-02641-8</p>
+        <button type="button" class="btn" id="btnCite">复制引用格式</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>四个功能</h2>
+    <div class="steps4">
+      <a class="s4" href="#generate"><b>流程生成</b><span>样本名、数据路径、表型，生成部署脚本和按顺序提交作业的脚本。</span></a>
+      <a class="s4" href="#clusters"><b>集群连接</b><span>保存你的 SSH 账号，在页面里上传脚本、提交作业、看日志。</span></a>
+      <a class="s4" href="#postgwas"><b>Post-GWAS</b><span>把显著 k-mer 比对到参考基因组，找附近基因，画曼哈顿图。</span></a>
+      <a class="s4" href="#assistant"><b>AI 助手</b><span>接入 DeepSeek：一句话填表、读日志找原因、一键跑完整流程，还能调整曼哈顿图。</span></a>
+    </div>
+  </section>
+</section>

@@ -1,0 +1,84 @@
+
+#!/usr/bin/env bash
+# 按步骤顺序提交 kmeria_wrapper.pl 生成的作业脚本。
+# 后一步会等前一步的全部作业成功结束后才开始。
+#   bash submit_chain.sh         只预览, 不提交
+#   bash submit_chain.sh --go    真正提交
+set -euo pipefail
+
+OUT_DIR="@@OUT_DIR@@"
+SCHED="@@SCHED@@"
+STEP_DIRS=(@@STEP_DIRS@@)
+
+GO=0
+if [ "${1:-}" = "--go" ]; then GO=1; fi
+
+prev=""
+for d in "${STEP_DIRS[@]}"; do
+  dir="$OUT_DIR/$d"
+  scripts=()
+  # 兼容 wrapper 多嵌一层同名目录的情况 (results/05_association/05_association/)
+  if [ -d "$dir/$d" ] && ! find "$dir" -maxdepth 1 -type f -name '*.sh' | grep -q .; then dir="$dir/$d"; fi
+  if [ -d "$dir" ]; then
+    while IFS= read -r f; do scripts+=("$f"); done < <(
+      find "$dir" -maxdepth 1 -type f \( -name '*.sh' -o -name '*.sbatch' -o -name '*.pbs' -o -name '*.qsub' -o -name '*.job' \) | sort
+    )
+  fi
+  if [ "${#scripts[@]}" -eq 0 ]; then
+    echo "[提示] $d 里没有找到作业脚本, 已跳过"
+    continue
+  fi
+  ids=()
+  for s in "${scripts[@]}"; do
+    if [ "$GO" -eq 0 ]; then
+      if [ -n "$prev" ]; then
+        echo "[预览] $d  <-  $(basename "$s")   (等 $prev 全部完成后开始)"
+      else
+        echo "[预览] $d  <-  $(basename "$s")"
+      fi
+      ids+=("x")
+      continue
+    fi
+    case "$SCHED" in
+      slurm)
+        if [ -n "$prev" ]; then
+          jid=$(sbatch --parsable --dependency=afterok:"$prev" "$s")
+        else
+          jid=$(sbatch --parsable "$s")
+        fi
+        jid="${jid%%;*}" ;;
+      sge)
+        if [ -n "$prev" ]; then
+          jid=$(qsub -terse -hold_jid "$prev" "$s")
+        else
+          jid=$(qsub -terse "$s")
+        fi ;;
+      pbs)
+        if [ -n "$prev" ]; then
+          jid=$(qsub -W depend=afterok:"$prev" "$s")
+        else
+          jid=$(qsub "$s")
+        fi ;;
+      local)
+        bash "$s"; jid="done" ;;
+      *)
+        echo "未知的调度系统: $SCHED"; exit 1 ;;
+    esac
+    echo "[已提交] $d  <-  $(basename "$s")   作业号: $jid"
+    ids+=("$jid")
+  done
+  if [ "$GO" -eq 0 ]; then
+    prev="$d"
+  else
+    case "$SCHED" in
+      slurm|pbs) prev=$(IFS=:; echo "${ids[*]}") ;;
+      sge)       prev=$(IFS=,; echo "${ids[*]}") ;;
+      *)         prev="" ;;
+    esac
+  fi
+done
+
+if [ "$GO" -eq 0 ]; then
+  echo
+  echo "以上只是预览, 没有提交任何作业。确认无误后运行: bash submit_chain.sh --go"
+fi
