@@ -1,0 +1,4 @@
+flask>=3.0
+paramiko>=3.4
+cryptography>=42
+truststore>=0.9; python_version >= "3.10"

@@ -1,0 +1,128 @@
+<section class="view" id="v-postgwas" hidden>
+  <div class="pagehead">
+    <div>
+      <p class="eyebrow">Post-GWAS</p>
+      <h1>显著 k-mer 定位与曼哈顿图</h1>
+      <p class="lede">按 KMERIA Wiki 的 Naive Approach：把显著 k-mer 用 BLAST 比对到参考基因组，得到坐标后画出曼哈顿图。右侧生成脚本，也可以先预览图的样子。</p>
+    </div>
+  </div>
+  <div class="grid">
+    <form class="form" id="pgForm" autocomplete="off" onsubmit="return false">
+      <section class="card">
+        <div class="step-h"><span class="n">1</span><h2>关联分析结果</h2></div>
+        <div class="field"><label for="pg_assocGlob">结果文件</label>
+          <input type="text" id="pg_assocGlob" spellcheck="false" placeholder="/path/to/results/05_association/*.assoc.txt">
+          <span class="hint">可以用通配符匹配多个文件，脚本会先合并。关联分析跑完后，用 <code>ls</code> 看一下 <code>05_association</code> 里实际的文件名再填。</span></div>
+        <div class="fields">
+          <div class="field"><label for="pg_thresh">p 值筛选阈值</label><input type="text" id="pg_thresh" spellcheck="false">
+            <span class="hint">p 小于它的 k-mer 才会拿去比对，官方示例用 1e-4。</span></div>
+          <div class="field"><label for="pg_lineP">曼哈顿图阈值线</label><input type="text" id="pg_lineP" spellcheck="false">
+            <span class="hint">图上虚线的位置，超过它的点会高亮。严格的全基因组阈值可以用 0.05 除以检验的 k-mer 数，或用 KMERIA 自带的 <code>scripts/calc_gwas_threshold_new.R</code> 计算。</span></div>
+        </div>
+        <p class="hint sp">关联程序（bimbamAsso 或 GEMMA）沿用「流程生成」里的选择，用来决定从哪两列取 k-mer 和 p 值。</p>
+      </section>
+
+      <section class="card">
+        <div class="step-h"><span class="n">2</span><h2>参考基因组与 BLAST</h2></div>
+        <div class="field"><span class="lab">BLAST 库怎么来？</span>
+          <div class="radios" role="radiogroup">
+            <label><input type="radio" name="pg_dbMode" value="genome" checked> 用参考基因组 fasta 自动建库</label>
+            <label><input type="radio" name="pg_dbMode" value="db"> 我已经建好了库</label>
+          </div></div>
+        <div class="field sp" id="pg_genomeBox"><label for="pg_genomeFasta">参考基因组 fasta</label><input type="text" id="pg_genomeFasta" spellcheck="false" placeholder="/path/to/genome.fa">
+          <label class="check" style="margin-top:6px"><input type="checkbox" id="pg_useFai"><span>用 <code>samtools faidx</code> 取染色体长度，横轴画满全部染色体</span></label></div>
+        <div class="field sp" id="pg_dbBox" hidden><label for="pg_blastDb">BLAST 库路径</label><input type="text" id="pg_blastDb" spellcheck="false" placeholder="/path/to/blastdb/ref">
+          <span class="hint">写库的前缀，不带 <code>.nhr</code> 这类后缀。</span></div>
+        <div class="fields sp">
+          <div class="field"><label for="pg_evalue">e-value</label><input type="text" id="pg_evalue" spellcheck="false"></div>
+          <div class="field"><label for="pg_wordSize">word_size</label><input type="number" id="pg_wordSize" min="4" step="1"></div>
+          <div class="field"><label for="pg_blastThreads">线程数</label><input type="number" id="pg_blastThreads" min="1" step="1"></div>
+        </div>
+        <div class="field sp"><label for="pg_excludeRe">排除未定位的序列</label><input type="text" id="pg_excludeRe" spellcheck="false">
+          <span class="hint">名字匹配这个表达式的 contig 或 scaffold 会被丢掉，官方示例是 <code>Chr00|tig|scaf</code>。留空表示全部保留。</span></div>
+      </section>
+
+      <section class="card">
+        <div class="step-h"><span class="n">3</span><h2>附近的基因（可选）</h2></div>
+        <label class="check"><input type="checkbox" id="pg_genesOn"><span>列出显著 k-mer 附近的基因<br><span class="hint">这是 easyKMERIA 加的扩展步骤，不在官方 Wiki 里，需要 GFF3 注释和 <code>bedtools</code>。</span></span></label>
+        <div class="fields sp" id="pg_geneBox" hidden>
+          <div class="field"><label for="pg_gff3">GFF3 注释文件</label><input type="text" id="pg_gff3" spellcheck="false" placeholder="/path/to/genes.gff3"></div>
+          <div class="field"><label for="pg_window">搜索范围（bp）</label><input type="number" id="pg_window" min="0" step="1000">
+            <span class="hint">k-mer 两侧各多少 bp 内的基因算“附近”。</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="step-h"><span class="n">4</span><h2>图的样式</h2></div>
+        <div class="field"><span class="lab">预设配色</span><div class="presets" id="pgPresets"></div></div>
+        <div class="field sp"><span class="lab">自定义颜色</span><div class="colors" id="pgColors"></div></div>
+        <div class="field sp"><label for="pg_aiPrompt">让 DeepSeek 帮你调整图</label>
+          <div class="ai-row"><input type="text" id="pg_aiPrompt" spellcheck="false" placeholder="例如：点小一点并半透明，阈值线改成 5e-8，纵轴到 12，去掉 Chr 前缀，标出前 5 个 k-mer，导出 600 dpi 的 PNG">
+            <button type="button" class="btn primary" id="pg_aiGo">应用</button><button type="button" class="btn" id="pg_aiUndo" hidden>撤销上次修改</button></div>
+          <div class="hint" id="pg_aiMsg" role="status"></div></div>
+        <div class="fields sp">
+          <div class="field"><label for="pg_figW">图宽（英寸）</label><input type="number" id="pg_figW" min="3" step="0.5"></div>
+          <div class="field"><label for="pg_figH">图高（英寸）</label><input type="number" id="pg_figH" min="2" step="0.5"></div>
+          <div class="field"><label for="pg_figTitle">图标题（英文）</label><input type="text" id="pg_figTitle" spellcheck="false"></div>
+        </div>
+        <details class="adv"><summary>更多绘图参数</summary>
+          <div class="fields">
+            <div class="field"><label for="pg_ptSize">普通点大小</label><input type="number" id="pg_ptSize" min="0.1" max="5" step="0.1"></div>
+            <div class="field"><label for="pg_hiSize">高亮点大小</label><input type="number" id="pg_hiSize" min="0.1" max="8" step="0.1"></div>
+            <div class="field"><label for="pg_alpha">点的不透明度</label><input type="number" id="pg_alpha" min="0.05" max="1" step="0.05"></div>
+            <div class="field"><label for="pg_shape">点的形状</label><select id="pg_shape"><option value="circle">实心圆</option><option value="triangle">三角</option><option value="square">方块</option><option value="hollow">空心圆</option></select></div>
+            <div class="field"><label for="pg_ymax">纵轴上限</label><input type="text" id="pg_ymax" spellcheck="false" placeholder="留空自动"></div>
+            <div class="field"><label for="pg_fontScale">文字缩放</label><input type="number" id="pg_fontScale" min="0.5" max="3" step="0.1"></div>
+            <div class="field"><label for="pg_lineStyle">阈值线线型</label><select id="pg_lineStyle"><option value="dashed">虚线</option><option value="solid">实线</option><option value="dotted">点线</option></select></div>
+            <div class="field"><label for="pg_line2P">第二条阈值线（p 值）</label><input type="text" id="pg_line2P" spellcheck="false" placeholder="留空不画，如 1e-5"></div>
+            <div class="field"><label for="pg_labelTop">标出前 N 个 k-mer</label><input type="number" id="pg_labelTop" min="0" max="30" step="1"></div>
+            <div class="field"><label for="pg_dpi">PNG 分辨率（dpi）</label><input type="number" id="pg_dpi" min="72" max="1200" step="50"></div>
+            <div class="field"><label for="pg_format">输出格式</label><select id="pg_format"><option value="both">PDF 和 PNG</option><option value="pdf">只要 PDF</option><option value="png">只要 PNG</option></select></div>
+          </div>
+          <div class="radios sp">
+            <label class="check"><input type="checkbox" id="pg_showLine"><span>画阈值线</span></label>
+            <label class="check"><input type="checkbox" id="pg_grid"><span>横向网格线</span></label>
+            <label class="check"><input type="checkbox" id="pg_stripChr"><span>横轴去掉 Chr 前缀</span></label>
+          </div>
+        </details>
+        <details class="adv"><summary>集群资源</summary>
+          <div class="fields">
+            <div class="field"><label for="pg_pgMemory">内存（GB）</label><input type="number" id="pg_pgMemory" min="1" step="1"></div>
+            <div class="field"><label for="pg_pgTime">最长运行时间</label><input type="text" id="pg_pgTime" spellcheck="false"></div>
+          </div>
+          <p class="hint sp">队列和调度系统沿用「流程生成」里的设置。</p>
+        </details>
+      </section>
+    </form>
+
+    <aside class="card out" aria-label="Post-GWAS 结果">
+      <div class="checks" id="pgChecks"></div>
+      <div class="tabs" role="tablist" id="pgTabs">
+        <button class="tab" role="tab" data-tab="preview" aria-selected="true">图预览</button>
+        <button class="tab" role="tab" data-tab="script" aria-selected="false">postgwas.sh</button>
+        <button class="tab" role="tab" data-tab="rscript" aria-selected="false">R 绘图脚本</button>
+        <button class="tab" role="tab" data-tab="cluster" aria-selected="false">部署到集群</button>
+      </div>
+      <div class="panel" id="pp-preview" role="tabpanel">
+        <div class="radios">
+          <label><input type="radio" name="pg_src" value="demo" checked> 示例数据</label>
+          <label><input type="radio" name="pg_src" value="mine"> 粘贴我的结果</label>
+        </div>
+        <div id="pg_mineBox" hidden>
+          <label for="pg_plotText" class="lab">sigkmer.assoc.blastn.plot.txt 的内容</label>
+          <textarea id="pg_plotText" rows="5" spellcheck="false" placeholder="asso_kmer18&#9;Chr10&#9;91001&#9;2.875e-07"></textarea>
+          <span class="hint">四列：k-mer 编号、染色体、位置、p 值。服务器上用 <code>cat</code> 或 <code>head -n 2000</code> 看，复制过来。</span>
+          <label for="pg_faiText" class="lab" style="margin-top:8px">染色体长度（可选，.fai 文件内容）</label>
+          <textarea id="pg_faiText" rows="3" spellcheck="false" placeholder="Chr1&#9;85123456"></textarea>
+        </div>
+        <p class="hint" id="pg_previewNote"></p>
+        <div class="plotbox"><canvas id="pgCanvas" role="img" aria-label="曼哈顿图预览"></canvas></div>
+        <div class="rowline"><span class="sum" id="pgSum"></span><button type="button" class="btn" id="pgSavePng" hidden>保存 PNG</button></div>
+        <div class="tbl-wrap"><table class="tbl" id="pgTop"></table></div>
+      </div>
+      <div class="panel" id="pp-script" role="tabpanel" hidden></div>
+      <div class="panel" id="pp-rscript" role="tabpanel" hidden></div>
+      <div class="panel" id="pp-cluster" role="tabpanel" hidden></div>
+    </aside>
+  </div>
+</section>

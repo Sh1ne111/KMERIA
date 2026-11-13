@@ -1,0 +1,49 @@
+<section class="view" id="v-clusters" hidden>
+  <div class="pagehead">
+    <div>
+      <p class="eyebrow">Clusters</p>
+      <h1>集群连接</h1>
+      <p class="lede">保存常用的 SSH 连接，流程和 Post-GWAS 可以直接复用。凭据加密存储在本机。</p>
+    </div>
+    <button type="button" class="btn primary big" id="btnAddCluster">添加连接</button>
+  </div>
+  <div class="callout" id="clustersStatic" hidden>
+    <b>这里需要运行 easyKMERIA 程序。</b>网页没有办法直接登录服务器，密码和私钥也不应该放在网页里。下载程序包后在你的电脑上运行 <code>python app.py</code>，用浏览器打开 <code>http://127.0.0.1:8765</code> 就能使用本页的全部功能。
+  </div>
+  <div class="clusters" id="clusterList"></div>
+</section>
+
+<div class="modal" id="clusterModal" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="cmTitle">
+    <div class="dlg-h"><div><p class="eyebrow" id="cmEyebrow">SSH</p><h2 id="cmTitle">添加连接</h2></div><button type="button" class="x" data-close aria-label="关闭">×</button></div>
+    <form class="dlg-b" id="clusterForm" autocomplete="off" onsubmit="return false">
+      <div class="fields">
+        <div class="field"><label for="cf_name">连接名称</label><input type="text" id="cf_name" placeholder="例如 AGIS"></div>
+        <div class="field"><label for="cf_scheduler">调度系统</label>
+          <select id="cf_scheduler"><option value="slurm">SLURM</option><option value="sge">SGE</option><option value="pbs">PBS</option><option value="local">无（直接运行）</option></select></div>
+        <div class="field"><label for="cf_host">服务器地址</label><input type="text" id="cf_host" placeholder="192.168.1.44 或 hpc.example.edu.cn" spellcheck="false"></div>
+        <div class="field"><label for="cf_port">端口</label><input type="number" id="cf_port" value="22" min="1" max="65535"></div>
+        <div class="field"><label for="cf_user">用户名</label><input type="text" id="cf_user" spellcheck="false"></div>
+        <div class="field"><label for="cf_auth">认证方式</label>
+          <select id="cf_auth"><option value="password">密码</option><option value="key">私钥</option></select></div>
+      </div>
+      <div class="field sp" id="cf_pwBox"><label for="cf_password">登录密码</label>
+        <input type="password" id="cf_password" autocomplete="new-password">
+        <span class="hint" id="cf_pwHint"></span></div>
+      <div class="field sp" id="cf_keyBox" hidden><label for="cf_key">私钥内容</label>
+        <textarea id="cf_key" rows="5" spellcheck="false" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----"></textarea>
+        <label for="cf_pass" style="margin-top:8px">私钥口令（没有口令就留空）</label>
+        <input type="password" id="cf_pass" autocomplete="new-password">
+        <span class="hint" id="cf_keyHint"></span></div>
+      <div class="fields sp">
+        <div class="field"><label for="cf_workdir">工作路径</label><input type="text" id="cf_workdir" placeholder="/public/home/你的用户名/project" spellcheck="false">
+          <span class="hint">项目文件都放在这个目录下，页面只会在它里面读写。</span></div>
+        <div class="field"><label for="cf_queue">队列 / 分区</label><input type="text" id="cf_queue" spellcheck="false"></div>
+        <div class="field"><label for="cf_home">KMERIA 安装目录</label><input type="text" id="cf_home" placeholder="/public/home/你的用户名/software/KMERIA" spellcheck="false"></div>
+      </div>
+      <label class="check sp" id="cf_resetBox" hidden><input type="checkbox" id="cf_reset"><span>重新记录服务器指纹<br><span class="hint">只在服务器重装、或你确认换了机器后勾选。</span></span></label>
+      <p class="form-err" id="cf_err" role="alert" hidden></p>
+      <div class="dlg-f"><button type="button" class="btn" data-close>取消</button><button type="submit" class="btn primary" id="cf_save">保存</button></div>
+    </form>
+  </div>
+</div>

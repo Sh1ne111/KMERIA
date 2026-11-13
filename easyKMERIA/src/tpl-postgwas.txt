@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+@@HEADER@@
+# ====================================================================
+#  KMERIA Post-GWAS: 显著 k-mer 的基因组定位与曼哈顿图
+#  项目:   @@PROJECT@@
+#  生成于: @@DATE@@  (easyKMERIA)
+#  依据:   KMERIA Wiki "Post GWAS Analysis" 的 Naive Approach (BLAST 比对关联 k-mer)
+#
+#  用法:   bash postgwas.sh        (在登录节点直接运行)
+#          sbatch/qsub postgwas.sh (提交到集群, 脚本头部已带资源设置)
+# ====================================================================
+set -euo pipefail
+
+OUT_DIR="@@OUT_DIR@@"
+mkdir -p "$OUT_DIR"
+cd "$OUT_DIR"
+SCRIPT_DIR="@@SCRIPT_DIR@@"
+@@ENV_BLOCK@@
+for cmd in blastn@@EXTRA_CMDS@@; do
+  command -v "$cmd" >/dev/null 2>&1 || { echo "[缺失] 找不到命令: $cmd (请安装或先 module load / conda activate)"; exit 1; }
+done
+
+# ---------- 1. 合并关联分析结果 ----------
+echo ">>> 合并关联分析结果: @@ASSOC_GLOB@@"
+ls -1 @@ASSOC_GLOB@@ >/dev/null 2>&1 || { echo "[缺失] 没有匹配到关联结果文件, 请到 05_association 目录用 ls 查看实际文件名"; exit 1; }
+cat @@ASSOC_GLOB@@ > all_assoc_results
+
+# ---------- 2. 取出显著 k-mer, 写成 FASTA ----------
+# @@COL_NOTE@@
+awk '$@@P_COL@@ < @@THRESH@@' all_assoc_results > @@ASSOC_FILE@@
+n_sig=$(wc -l < @@ASSOC_FILE@@)
+echo ">>> p < @@THRESH@@ 的显著 k-mer 数量: $n_sig"
+if [ "$n_sig" -eq 0 ]; then echo "没有满足阈值的 k-mer, 请放宽阈值后重试"; exit 1; fi
+if [ "$n_sig" -gt 300000 ]; then echo "[提示] 显著 k-mer 超过 30 万条, BLAST 会比较慢, 建议收紧阈值"; fi
+awk '{printf ">asso_kmer%d_%s\n%s\n", NR, $@@P_COL@@, $@@K_COL@@}' @@ASSOC_FILE@@ > sigkmer.assoc.fasta
+
+# ---------- 3. 准备 BLAST 数据库 ----------
+@@DB_BLOCK@@
+
+# ---------- 4. BLAST 比对到参考基因组 ----------
+echo ">>> blastn 比对 (线程 @@THREADS@@)"
+blastn -query sigkmer.assoc.fasta \
+       -db "$DB" \
+       -out sigkmer.assoc.blastn \
+       -evalue @@EVALUE@@ \
+       -word_size @@WORDSIZE@@ \
+       -outfmt 6 \
+       -num_threads @@THREADS@@
+
+# ---------- 5. 过滤并整理坐标 ----------
+@@FILTER_BLOCK@@
+n_hit=$(wc -l < sigkmer.assoc.blastn.filter)
+echo ">>> 定位到参考基因组的 k-mer: $n_hit / $n_sig"
+if [ "$n_hit" -eq 0 ]; then echo "没有 k-mer 定位成功, 请检查 BLAST 库是否对应同一套参考基因组"; exit 1; fi
+awk '{print $1"\t"$2"\t"$9"\t"$10}' sigkmer.assoc.blastn.filter | sort -k2,2 -k3,3n > sigkmer.blastn.genome.coord
+# 输出四列: k-mer 编号, 染色体, 位置, p 值 (反向比对时取较小的坐标; 按制表符切分, 染色体名里有下划线也没问题)
+awk 'BEGIN{FS="\t"; OFS="\t"} {n=split($1,a,"_"); print a[1]"_"a[2], $2, ($3<$4?$3:$4), a[3]}' sigkmer.blastn.genome.coord > sigkmer.assoc.blastn.plot.txt
+@@FAI_BLOCK@@@@GENE_BLOCK@@
+# ---------- 6. 曼哈顿图 ----------
+if command -v Rscript >/dev/null 2>&1; then
+  echo ">>> 绘制曼哈顿图"
+  Rscript "$SCRIPT_DIR/plot_manhattan_easy.R" sigkmer.assoc.blastn.plot.txt manhattan @@LINE_P@@ @@FAI_ARG@@ @@EXCL_ARG@@
+else
+  echo "[提示] 没有找到 Rscript, 已跳过画图。可以把 sigkmer.assoc.blastn.plot.txt 下载到本地, 在 easyKMERIA 的 Post-GWAS 页面预览和出图。"
+fi
+
+echo
+echo "完成。主要结果在 $OUT_DIR:"
+echo "  sigkmer.assoc.blastn.plot.txt   定位结果 (编号, 染色体, 位置, p 值)"
+echo "  manhattan.pdf / manhattan.png   曼哈顿图"
+echo "  top_hits.tsv                    p 值最小的 20 个位点"@@GENE_ECHO@@

@@ -1,0 +1,113 @@
+#!/usr/bin/env Rscript
+# easyKMERIA 生成: 显著 k-mer 的曼哈顿图 (只含能定位到参考基因组的 k-mer)
+# 用法: Rscript plot_manhattan_easy.R <plot.txt> <输出前缀> <阈值线 p> [<ref.fa.fai>|NONE] [<要排除的染色体正则>|NONE]
+# 输入 plot.txt 为制表符分隔的四列: 编号, 染色体, 位置, p 值
+args <- commandArgs(trailingOnly = TRUE)
+infile    <- if (length(args) >= 1) args[1] else "sigkmer.assoc.blastn.plot.txt"
+outprefix <- if (length(args) >= 2) args[2] else "manhattan"
+thr       <- if (length(args) >= 3) as.numeric(args[3]) else @@LINE_P@@
+fai       <- if (length(args) >= 4 && args[4] != "NONE") args[4] else ""
+excl      <- if (length(args) >= 5 && args[5] != "NONE") args[5] else ""
+
+# ---- 样式 (由 easyKMERIA 的配色设置生成) ----
+chr_colors <- c(@@CHR_COLORS@@)
+col_hi     <- "@@HI@@"
+col_line   <- "@@LINE@@"
+col_bg     <- "@@BG@@"
+col_text   <- "@@TEXT@@"
+fig_w      <- @@W@@
+fig_h      <- @@H@@
+fig_title  <- "@@TITLE@@"
+pt_cex     <- @@PT_CEX@@        # 普通点大小
+hi_cex     <- @@HI_CEX@@        # 高亮点大小
+pt_alpha   <- @@ALPHA@@        # 点的不透明度 (0-1)
+ymax_fix   <- @@YMAX@@        # 纵轴上限, NA 表示自动
+show_line  <- @@SHOW_LINE@@     # 是否画阈值线
+line_lty   <- @@LTY@@           # 阈值线线型: 1 实线, 2 虚线, 3 点线
+line2_p    <- @@LINE_TWO@@        # 第二条 (提示性) 阈值线的 p 值, NA 表示不画
+grid_on    <- @@GRID@@         # 是否画横向网格线
+strip_chr  <- @@STRIP@@        # 横轴去掉 Chr 前缀
+pch_v      <- @@PCH@@           # 点形状: 19 实心圆, 17 三角, 15 方块, 1 空心圆
+img_dpi    <- @@DPI@@
+img_fmt    <- "@@FMT@@"         # both / pdf / png
+label_top  <- @@LABEL_TOP@@     # 标出 p 值最小的前 N 个 k-mer
+font_scale <- @@FONT@@          # 文字整体缩放
+
+d <- read.table(infile, header = FALSE, sep = "\t", quote = "", comment.char = "",
+                stringsAsFactors = FALSE, col.names = c("id", "chr", "pos", "p"))
+if (nrow(d) == 0) stop("输入文件里没有数据")
+d$p   <- suppressWarnings(as.numeric(d$p))
+d$pos <- suppressWarnings(as.numeric(d$pos))
+d <- d[is.finite(d$p) & is.finite(d$pos), ]
+d$p[d$p <= 0] <- .Machine$double.xmin   # p 值下溢为 0 时按最小正数处理
+
+nat_order <- function(x) {
+  k <- suppressWarnings(as.numeric(gsub("[^0-9]", "", x)))
+  order(is.na(k), k, x)
+}
+if (nzchar(fai) && file.exists(fai)) {
+  f <- read.table(fai, sep = "\t", header = FALSE, quote = "", stringsAsFactors = FALSE)[, 1:2]
+  names(f) <- c("chr", "len")
+  if (nzchar(excl)) f <- f[!grepl(excl, f$chr), ]
+} else {
+  f <- aggregate(pos ~ chr, d, max)
+  names(f) <- c("chr", "len")
+}
+f <- f[nat_order(f$chr), ]
+d <- d[d$chr %in% f$chr, ]
+if (nrow(d) == 0) stop("所有 k-mer 都落在被排除的染色体上")
+f$off <- c(0, head(cumsum(as.numeric(f$len)), -1))
+ci  <- match(d$chr, f$chr)
+d$x <- d$pos + f$off[ci]
+d$y <- -log10(d$p)
+total <- sum(as.numeric(f$len))
+
+draw <- function() {
+  par(bg = col_bg, fg = col_text, col.axis = col_text, col.lab = col_text,
+      col.main = col_text, mar = c(4.5, 4.5, 3, 1))
+  ymax <- if (is.finite(ymax_fix)) ymax_fix else max(c(d$y, -log10(thr), if (is.finite(line2_p)) -log10(line2_p))) * 1.08
+  plot(NA, xlim = c(0, total), ylim = c(0, ymax), xaxs = "i", yaxs = "i",
+       xlab = "Chromosome", ylab = expression(-log[10](italic(P))),
+       main = fig_title, axes = FALSE, cex.lab = font_scale, cex.main = 1.2 * font_scale)
+  box(col = col_text)
+  if (grid_on) abline(h = pretty(c(0, ymax)), col = adjustcolor(col_text, alpha.f = 0.12))
+  sig <- d$p < thr
+  inside <- d$y <= ymax
+  ptcol <- function(i) adjustcolor(chr_colors[(ci[i] - 1) %% length(chr_colors) + 1], alpha.f = pt_alpha)
+  i1 <- which(!sig & inside); i2 <- which(sig & inside)
+  points(d$x[i1], d$y[i1], pch = pch_v, cex = pt_cex, col = ptcol(i1))
+  points(d$x[i2], d$y[i2], pch = pch_v, cex = hi_cex, col = adjustcolor(col_hi, alpha.f = pt_alpha))
+  if (show_line) abline(h = -log10(thr), lty = line_lty, col = col_line)
+  if (is.finite(line2_p)) abline(h = -log10(line2_p), lty = 3, col = col_line)
+  if (label_top > 0) {
+    tp <- head(d[order(d$p), ], label_top)
+    tp <- tp[tp$y <= ymax, ]
+    if (nrow(tp) > 0) text(tp$x, tp$y, labels = tp$id, pos = 3, cex = 0.6 * font_scale, col = col_text, xpd = NA)
+  }
+  mid <- f$off + as.numeric(f$len) / 2
+  idx <- if (nrow(f) > 30) seq(1, nrow(f), by = 2) else seq_len(nrow(f))
+  labs <- if (strip_chr) sub("^[Cc]hr", "", f$chr[idx]) else f$chr[idx]
+  axis(1, at = mid[idx], labels = labs, tick = FALSE, cex.axis = 0.8 * font_scale)
+  axis(2, las = 1, cex.axis = font_scale)
+}
+
+if (img_fmt != "png") {
+  pdf(paste0(outprefix, ".pdf"), width = fig_w, height = fig_h)
+  draw()
+  invisible(dev.off())
+}
+if (img_fmt != "pdf") {
+  png_ok <- tryCatch({
+    png(paste0(outprefix, ".png"), width = fig_w, height = fig_h, units = "in", res = img_dpi, type = "cairo")
+    draw()
+    invisible(dev.off())
+    TRUE
+  }, error = function(e) FALSE, warning = function(w) FALSE)
+  while (dev.cur() > 1) invisible(dev.off())
+  if (!png_ok) message("[提示] 这台机器画不了 PNG, 只生成了 PDF")
+}
+
+top <- head(d[order(d$p), c("id", "chr", "pos", "p")], 20)
+write.table(top, "top_hits.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
+cat(sprintf("已画出 %d 个定位到 %d 条染色体/序列上的 k-mer, 其中 %d 个超过阈值线\n",
+            nrow(d), length(unique(d$chr)), sum(d$p < thr)))

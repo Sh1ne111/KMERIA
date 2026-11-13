@@ -1,0 +1,207 @@
+<section class="view" id="v-generate" hidden>
+
+
+  <div class="pagehead">
+    <div>
+      <p class="eyebrow">第一步</p>
+      <h1>流程生成</h1>
+      <p class="lede">填写样本名、原始数据路径和表型文件，右侧实时生成可以直接在服务器上运行的部署脚本和作业提交脚本。</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <form class="form" id="form" autocomplete="off" onsubmit="return false">
+
+      <div class="demo" id="demo">
+        <span id="demoText">当前填的是示例数据（12 份野生甘蔗样本），替换成你自己的信息即可。</span>
+        <span style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn" id="btnExample">载入示例</button>
+          <button type="button" class="btn" id="btnClear">清空全部</button>
+        </span>
+      </div>
+
+      <section class="card">
+        <div class="step-h"><span class="n">1</span><h2>项目与软件环境</h2></div>
+        <div class="fields">
+          <div class="field"><label for="project">项目名</label>
+            <input type="text" id="project" spellcheck="false">
+            <span class="hint">用作结果目录名，只用字母、数字、下划线。</span></div>
+          <div class="field"><label for="workDir">工作目录</label>
+            <input type="text" id="workDir" spellcheck="false">
+            <span class="hint">所有结果放在 <code>工作目录/项目名/</code> 下，需要有较大空间。</span></div>
+          <div class="field"><label for="kmeriaHome">KMERIA 安装路径</label>
+            <input type="text" id="kmeriaHome" spellcheck="false">
+            <span class="hint">还没装？右侧「安装 KMERIA」页给出命令。</span></div>
+          <div class="field"><label for="condaEnv">软件环境名（conda / mamba / micromamba）</label>
+            <input type="text" id="condaEnv" spellcheck="false">
+            <span class="hint">官方环境文件创建的名字是 <code>kmeriaenv</code>。脚本会自动识别服务器上用的是 micromamba、mamba 还是 conda；都不用就留空，或在“额外环境命令”里写你自己的激活命令。</span></div>
+        </div>
+        <div class="fields one">
+          <div class="field"><label for="preCmd">额外环境命令（可选）</label>
+            <textarea id="preCmd" rows="2" style="min-height:56px" spellcheck="false" placeholder="例如：module load gcc/11.2.0"></textarea>
+            <span class="hint">集群需要 <code>module load</code> 时写在这里，每行一条，会原样写进脚本。</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="step-h"><span class="n">2</span><h2>测序数据与样本</h2></div>
+        <div class="field">
+          <span class="lab">原始数据怎么放的？</span>
+          <div class="radios" role="radiogroup">
+            <label><input type="radio" name="dataMode" value="dir" checked> 都在同一个目录里</label>
+            <label><input type="radio" name="dataMode" value="perSample"> 每个样本的路径不一样</label>
+          </div>
+        </div>
+        <div class="field sp" id="fastqDirBox">
+          <label for="fastqDir">原始数据目录</label>
+          <input type="text" id="fastqDir" spellcheck="false">
+          <span class="hint">目录里的文件名要写成 <code>样本名_R1.fq.gz</code> 和 <code>样本名_R2.fq.gz</code>，或者 <code>样本名_1.fq.gz</code> 和 <code>样本名_2.fq.gz</code>。脚本会在运行前逐个检查。</span>
+        </div>
+        <div class="field sp">
+          <div class="rowline">
+            <label for="sampleText" id="sampleLabel">样本表</label>
+            <span class="btn file-btn">导入文本文件<input type="file" id="fileSamples" accept=".txt,.tsv,.csv,.list,text/plain"></span>
+          </div>
+          <textarea id="sampleText" rows="8" spellcheck="false"></textarea>
+          <span class="hint" id="sampleHint"></span>
+          <div class="sum" id="sampleSum"></div>
+        </div>
+        <div class="fields">
+          <div class="field"><label for="defaultDepth">默认测序深度（X）</label>
+            <input type="number" id="defaultDepth" min="0" step="0.1">
+            <span class="hint">样本表里没写深度的样本用这个值。</span></div>
+          <div class="field"><label for="readLen">reads 长度（bp）</label>
+            <input type="number" id="readLen" min="30" step="1">
+            <span class="hint">用来换算 k-mer 深度，双端 150 就填 150。</span></div>
+        </div>
+        <div class="field sp">
+          <label class="check"><input type="checkbox" id="depthIsSeq">
+            <span>上面填的是测序深度，请自动换算成 k-mer 深度<br><span class="hint">KMERIA 的深度文件要求 k-mer 深度，公式是 测序深度 × (L − k + 1) / L。</span></span></label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="step-h"><span class="n">3</span><h2>表型文件</h2></div>
+        <div class="field">
+          <div class="rowline">
+            <label for="phenoText">表型表</label>
+            <span class="btn file-btn">导入文本文件<input type="file" id="filePheno" accept=".txt,.tsv,.csv,.pheno,text/plain"></span>
+          </div>
+          <textarea id="phenoText" rows="8" spellcheck="false" placeholder="sample&#9;TN&#9;AP&#10;SS001&#9;18&#9;83.2&#10;SS002&#9;25&#9;79.5"></textarea>
+          <span class="hint">第一列是样本名，后面每列一个性状，可以有表头。缺失值写 <code>NA</code> 或留空。Excel 里选中单元格直接粘贴即可。</span>
+          <div class="sum" id="phenoSum"></div>
+        </div>
+        <div class="fields">
+          <div class="field"><label for="trait">这次分析的性状</label>
+            <select id="trait"></select>
+            <span class="hint">一次分析一个性状。要分析别的性状，改这里再生成一份。</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="step-h"><span class="n">4</span><h2>分析参数</h2></div>
+        <div class="fields">
+          <div class="field"><label for="ploidy">倍性</label>
+            <input type="number" id="ploidy" min="1" step="1">
+            <span class="hint">四倍体填 4，六倍体填 6。样本表有倍性列时以该列为准。</span></div>
+          <div class="field"><label for="kmer">k-mer 长度</label>
+            <input type="number" id="kmer" min="2" max="63" step="1">
+            <span class="hint">做 GWAS 请不超过 31。</span></div>
+          <div class="field"><label for="counter">k-mer 计数程序</label>
+            <select id="counter">
+              <option value="kmeria">kmeria count（默认）</option>
+              <option value="kmc">KMC（超大数据更快）</option>
+            </select></div>
+          <div class="field"><label for="assoTool">关联分析程序</label>
+            <select id="assoTool">
+              <option value="bimbam">bimbamAsso（内置，推荐）</option>
+              <option value="gemma">GEMMA</option>
+            </select></div>
+          <div class="field"><label for="minAbund">k-mer 最低丰度</label>
+            <input type="number" id="minAbund" min="1" step="1">
+            <span class="hint">低深度数据可适当调低。</span></div>
+          <div class="field"><label for="maxAbund">k-mer 最高丰度</label>
+            <input type="number" id="maxAbund" min="1" step="1"></div>
+          <div class="field"><label for="missing">缺失率阈值</label>
+            <input type="number" id="missing" min="0" max="1" step="0.05">
+            <span class="hint">缺失比例超过它的 k-mer 会被过滤。</span></div>
+          <div class="field"><label for="step">运行哪些步骤</label>
+            <select id="step">
+              <option value="all">全部（计数到关联分析）</option>
+              <option value="count">只做 k-mer 计数</option>
+              <option value="kctm">只建 k-mer 矩阵</option>
+              <option value="filter">只做矩阵过滤</option>
+              <option value="m2b">只转换为 BIMBAM 格式</option>
+              <option value="asso">只做关联分析</option>
+            </select>
+            <span class="hint">某一步失败后，修好问题可以只重跑那一步。</span></div>
+        </div>
+        <details class="adv">
+          <summary>高级参数</summary>
+          <div class="fields">
+            <div class="field"><label for="batchSize">每个计数作业的样本数</label><input type="number" id="batchSize" min="1" step="1"></div>
+            <div class="field"><label for="kmcMemory">KMC 内存（GB）</label><input type="number" id="kmcMemory" min="1" step="1"></div>
+            <div class="field"><label for="kctmBatch">矩阵批大小</label><input type="number" id="kctmBatch" min="1" step="1"></div>
+            <div class="field"><label for="sketchSize">用于 PCA 和亲缘关系的 k-mer 数</label><input type="number" id="sketchSize" min="1" step="1"></div>
+            <div class="field"><label for="bgzfThreads">BGZF 压缩线程</label><input type="number" id="bgzfThreads" min="1" step="1"></div>
+            <div class="field"><label for="kinPrec">亲缘矩阵精度</label><input type="number" id="kinPrec" min="1" step="1"></div>
+            <div class="field"><label for="outPrec">关联结果精度</label><input type="number" id="outPrec" min="1" step="1"></div>
+            <div class="field"><label for="covar">协变量文件（可选）</label><input type="text" id="covar" spellcheck="false">
+              <span class="hint">留空则程序自己计算 PCA。</span></div>
+            <div class="field"><label for="kinship">亲缘矩阵文件（可选）</label><input type="text" id="kinship" spellcheck="false">
+              <span class="hint">留空则程序自己计算。</span></div>
+          </div>
+          <div class="field sp"><label class="check"><input type="checkbox" id="sepStrand"><span>分别统计正反链（<code>-C</code>，官方教程的写法）</span></label></div>
+        </details>
+      </section>
+
+      <section class="card">
+        <div class="step-h"><span class="n">5</span><h2>集群与资源</h2></div>
+        <div class="fields">
+          <div class="field"><label for="scheduler">作业调度系统</label>
+            <select id="scheduler">
+              <option value="slurm">SLURM（sbatch）</option>
+              <option value="sge">SGE（qsub）</option>
+              <option value="pbs">PBS（qsub）</option>
+              <option value="local">不用调度系统，直接运行</option>
+            </select></div>
+          <div class="field"><label for="queue">队列 / 分区</label><input type="text" id="queue" spellcheck="false">
+            <span class="hint">SLURM 里叫 partition，不确定就问管理员或运行 <code>sinfo</code>。</span></div>
+          <div class="field"><label for="threads">每个作业的线程数</label><input type="number" id="threads" min="1" step="1"></div>
+          <div class="field"><label for="memory">每个作业的内存（GB）</label><input type="number" id="memory" min="1" step="1"></div>
+          <div class="field"><label for="time">最长运行时间</label><input type="text" id="time" spellcheck="false">
+            <span class="hint">格式 小时:分:秒，不能超过队列上限。</span></div>
+        </div>
+      </section>
+    </form>
+
+    <aside class="card out" aria-label="生成结果">
+      <div class="checks" id="checks"></div>
+      <div class="tabs" role="tablist" id="tabs">
+        <button class="tab" role="tab" data-tab="deploy" aria-selected="true">部署脚本</button>
+        <button class="tab" role="tab" data-tab="cluster" aria-selected="false">部署到集群</button>
+        <button class="tab" role="tab" data-tab="inputs" aria-selected="false">输入文件</button>
+        <button class="tab" role="tab" data-tab="cmd" aria-selected="false">wrapper 命令</button>
+        <button class="tab" role="tab" data-tab="install" aria-selected="false">安装 KMERIA</button>
+        <button class="tab" role="tab" data-tab="howto" aria-selected="false">使用步骤</button>
+      </div>
+      <div class="panel" id="p-deploy" role="tabpanel"></div>
+      <div class="panel" id="p-cluster" role="tabpanel" hidden></div>
+      <div class="panel" id="p-inputs" role="tabpanel" hidden></div>
+      <div class="panel" id="p-cmd" role="tabpanel" hidden></div>
+      <div class="panel" id="p-install" role="tabpanel" hidden></div>
+      <div class="panel" id="p-howto" role="tabpanel" hidden>
+        <ol class="howto">
+          <li><b>检查左侧填写的内容。</b>右上方的检查清单没有红色「错误」就可以继续。</li>
+          <li><b>复制「部署脚本」。</b>在服务器上新建文件，例如 <code>vim deploy_kmeria.sh</code>，粘贴并保存。</li>
+          <li><b>运行部署脚本。</b>执行 <code>bash deploy_kmeria.sh</code>。它会建好目录、写入样本列表、深度文件和表型文件，检查原始数据是否齐全，再调用官方的 <code>kmeria_wrapper.pl</code> 生成各步骤的作业脚本。这一步不会提交任何作业。</li>
+          <li><b>看预览，再提交。</b>脚本最后会列出准备提交的作业。确认无误后执行 <code>cd 项目目录 &amp;&amp; bash submit_chain.sh --go</code>，各步骤会按顺序提交，后一步等前一步全部成功后才开始。</li>
+          <li><b>查看进度。</b>SLURM 用 <code>squeue -u $USER</code>，SGE 和 PBS 用 <code>qstat -u $USER</code>。日志写在 <code>results/各步骤目录/</code> 里的 <code>.log</code> 和 <code>.err</code> 文件中。</li>
+          <li><b>某一步失败时。</b>看日志，修好问题（常见是内存不够或路径写错），在左侧「运行哪些步骤」里选那一步，重新生成并运行。</li>
+          <li><b>结果在哪。</b>关联分析结果在 <code>results/05_association/</code>。显著性阈值和曼哈顿图可以用 KMERIA 自带的 <code>scripts/calc_gwas_threshold_new.R</code> 和 <code>scripts/plot_manhattan.R</code>，用法见官方 Wiki 的 Post-GWAS 页。</li>
+        </ol>
+        <p class="note">提交脚本会自动查找每个步骤目录里的 <code>.sh</code>、<code>.sbatch</code>、<code>.pbs</code> 作业文件。如果你的 KMERIA 版本把作业脚本放在别处，预览里会提示「没有找到作业脚本」，这时按 wrapper 的输出手动提交即可。</p>
+      </div>
+    </aside>
+  </div>
+</section>

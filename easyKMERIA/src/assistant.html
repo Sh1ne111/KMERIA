@@ -1,0 +1,41 @@
+<section class="view" id="v-assistant" hidden>
+  <div class="pagehead">
+    <div>
+      <p class="eyebrow">AI</p>
+      <h1>AI 助手</h1>
+      <p class="lede">用一句话填好表单，让 DeepSeek 帮你读日志找原因，或者一键跑完整流程：安装、部署、提交、监控、失败后修正重试，最后做 Post-GWAS 定位。每个会改动服务器的步骤都要你点“批准”。</p>
+    </div>
+  </div>
+  <div class="callout" id="agStatic" hidden>
+    <b>这里需要运行 easyKMERIA 程序。</b>AI 助手要登录你的服务器并调用 DeepSeek，网页预览里只能看看界面。
+  </div>
+  <div class="ag-grid">
+    <section class="card ag-side">
+      <h2>告诉我要做什么</h2>
+      <div class="field"><label for="ag_sel">服务器</label><select id="ag_sel"></select></div>
+      <div class="field sp"><label for="ag_text">一句话描述（可选）</label>
+        <textarea id="ag_text" rows="3" spellcheck="false" placeholder="例如：项目名 cane_gwas，8 倍体，原始数据在 /data/raw，用 slurm 的 normal 队列，每个作业 128G 内存"></textarea>
+        <span class="hint">会把这段话发给 DeepSeek 来填写表单；不会发送样本表和表型文件。</span></div>
+      <div class="ag-actions">
+        <button type="button" class="btn" id="ag_fill">① 填写表单</button>
+        <button type="button" class="btn" id="ag_install">② 检查并安装 KMERIA</button>
+        <button type="button" class="btn" id="ag_diag">③ 诊断最近一次运行</button>
+        <button type="button" class="btn primary" id="ag_auto">④ 一键跑完整流程</button>
+        <button type="button" class="btn armed" id="ag_stop" hidden>停止</button>
+      </div>
+      <div class="note ag-note">
+        <b>AI 能做什么、不能做什么</b>
+        <ul>
+          <li>AI 只负责“填表单字段”和“读日志给建议”，它输出的内容会先经过白名单校验，不会变成命令。</li>
+          <li>真正在服务器上执行的，只有 easyKMERIA 自己生成的脚本：安装、部署、提交、查看状态。</li>
+          <li>诊断时会把最近几个日志的末尾（密码、Key、邮箱已打码）发给 DeepSeek。</li>
+          <li>全流程最多自动修正重试 2 次，之后停下来等你处理。</li>
+        </ul>
+      </div>
+    </section>
+    <section class="card ag-main">
+      <div class="cl-top"><h2>进展</h2><button type="button" class="btn" id="ag_clear">清空</button></div>
+      <div class="ag-log" id="ag_log" aria-live="polite"><p class="muted" id="ag_empty">还没有任务。左边选一个开始。</p></div>
+    </section>
+  </div>
+</section>
