@@ -42,19 +42,8 @@ KMERIA 直接从 reads 出发，不依赖比对结果：统计每个样本的 k-
   <sub>基本思路：一个碱基的改变会改变所有覆盖它的 k-mer 的计数，KMERIA 就在这些计数上做关联分析。</sub>
 </p>
 
-### 论文中的结果
-
-KMERIA 发表于 *Nature Genetics*（2026）。论文中：
-
-- 在模拟数据和真实数据上，与现有方法做了基准比较；
-- 应用于 **290 份野生甘蔗（*Saccharum spontaneum*）材料**，并结合 15 份材料构建的图形泛基因组来捕获结构变异；
-- 鉴定出与蔗糖合成（*SsMGT*）和分蘖（包括 *SsERF14*、*SsNGA5*、*SsNAC*、*SsARF8*、*SsLOG*、*SsSCR*）有关的基因，可作为甘蔗育种的候选靶点。
-
-图、数据和方法的细节请阅读论文：[doi:10.1038/s41588-026-02641-8](https://doi.org/10.1038/s41588-026-02641-8)。
 
 ## 工作原理
-
-<p align="center"><img src="./images/kmeria_workflow.svg" alt="KMERIA 流程：count、kctm、filter、m2b、asso，然后是 Post-GWAS" width="100%"></p>
 
 | 步骤 | `--step` | 作用 | 输出目录 |
 | --- | --- | --- | --- |
@@ -306,14 +295,6 @@ Additional Help:
 
 更新记录以英文写在 [README.md](README.md#updates) 中。
 
-## <a name="third-party"></a> 第三方软件
-
-KMERIA 在 `external_tools/` 里附带了下列工具。如果你的分析用到了它们，也请一并引用：
-
-- **KMC**（k-mer 计数）：Kokot M, Długosz M, Deorowicz S. KMC 3: counting and manipulating k-mer statistics. *Bioinformatics* 33, 2759–2761 (2017).
-- **GEMMA**（混合模型关联分析）：Zhou X, Stephens M. Genome-wide efficient mixed-model analysis for association studies. *Nature Genetics* 44, 821–824 (2012).
-- **PLINK**：Chang CC *et al.* Second-generation PLINK: rising to the challenge of larger and richer datasets. *GigaScience* 4, 7 (2015).
-
 ## <a name="contact"></a> 联系方式
 
 欢迎提问、报告问题和提出建议：提交 [issue](https://github.com/Sh1ne111/KMERIA/issues)，或发邮件给 Chen Shuai：chensss1209@gmail.com。
@@ -322,14 +303,14 @@ KMERIA 在 `external_tools/` 里附带了下列工具。如果你的分析用到
 
 如果 KMERIA 对你的研究有帮助，请引用我们发表在 *Nature Genetics* 的论文：
 
-> Chen S, Liu X, Qu S, Song Y, Chai K, Liu H, Zhang Y, Xia Z, Li X, Wang J, Zhang M, Li H, Chen GB, Maliepaard C, Zhang X. A k-mer-based GWAS approach empowering gene mining in polyploids. *Nature Genetics* 58, 1711–1721 (2026). doi:[10.1038/s41588-026-02641-8](https://doi.org/10.1038/s41588-026-02641-8)
+> Chen S, Liu X, Qu S, Song Y, Chai K, Liu H, Zhang Y, Xia Z, Li X, Wang J, Zhang M, Li H, Chen GB, Maliepaard C, Zhang X. A  k-mer-based genome-wide association study approach empowering gene mining in polyploids. *Nature Genetics* 58, 1711–1721 (2026). doi:[10.1038/s41588-026-02641-8](https://doi.org/10.1038/s41588-026-02641-8)
 
 <details>
 <summary>BibTeX</summary>
 
 ```bibtex
 @article{chen2026kmeria,
-  title   = {A k-mer-based GWAS approach empowering gene mining in polyploids},
+  title   = {A k-mer-based genome-wide association study  approach empowering gene mining in polyploids},
   author  = {Chen, Shuai and Liu, Xinlong and Qu, Shenyang and Song, Yuhan and Chai, Kun and Liu, Hongbo and Zhang, Yuebin and Xia, Zhongqiang and Li, Xiaofeng and Wang, Jungang and Zhang, Muqing and Li, Hongbo and Chen, Guo Bo and Maliepaard, Chris and Zhang, Xingtan},
   journal = {Nature Genetics},
   volume  = {58},
