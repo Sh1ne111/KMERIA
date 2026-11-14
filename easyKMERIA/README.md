@@ -86,6 +86,6 @@ The wrapper layout assumed by `submit_chain.sh` was checked against `kmeria_wrap
 
 ## Citation
 
-If you use KMERIA, please cite: Chen Shuai *et al.* A k-mer-based GWAS approach empowering gene mining in polyploids. *Nature Genetics* (2026). doi:[10.1038/s41588-026-02641-8](https://doi.org/10.1038/s41588-026-02641-8).
+If you use KMERIA, please cite: Chen Shuai *et al.* A k-mer-based genome-wide association study approach empowering gene mining in polyploids. *Nature Genetics* (2026). doi:[10.1038/s41588-026-02641-8](https://doi.org/10.1038/s41588-026-02641-8).
 
 Licensed under the same [MIT License](../LICENSE) as KMERIA.
