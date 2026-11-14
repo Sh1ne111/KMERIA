@@ -42,19 +42,7 @@ KMERIA works from the reads instead of a read alignment. It counts k-mers in eac
   <sub>The idea: a base change alters the counts of every k-mer that covers it, and KMERIA runs the association on those counts.</sub>
 </p>
 
-### Results from the paper
-
-KMERIA was published in *Nature Genetics* (2026). In the paper:
-
-- the method is benchmarked on simulated and empirical data against existing methods;
-- it is applied to **290 wild sugarcane (*Saccharum spontaneum*) accessions**, together with a graph pangenome built from 15 accessions to capture structural variation;
-- it identifies genes behind sucrose biosynthesis (*SsMGT*) and tillering (including *SsERF14*, *SsNGA5*, *SsNAC*, *SsARF8*, *SsLOG* and *SsSCR*), which are candidate targets for sugarcane breeding.
-
-For the figures, numbers and methods, please read the paper: [doi:10.1038/s41588-026-02641-8](https://doi.org/10.1038/s41588-026-02641-8).
-
 ## How it works
-
-<p align="center"><img src="./images/kmeria_workflow.svg" alt="KMERIA workflow: count, kctm, filter, m2b, asso, then Post-GWAS" width="100%"></p>
 
 | Step | `--step` | What it does | Output folder |
 | --- | --- | --- | --- |
@@ -339,14 +327,14 @@ Questions, bug reports and feature requests are welcome: open an [issue](https:/
 
 If KMERIA helps your research, please cite our paper in *Nature Genetics*:
 
-> Chen S, Liu X, Qu S, Song Y, Chai K, Liu H, Zhang Y, Xia Z, Li X, Wang J, Zhang M, Li H, Chen GB, Maliepaard C, Zhang X. A k-mer-based GWAS approach empowering gene mining in polyploids. *Nature Genetics* 58, 1711–1721 (2026). doi:[10.1038/s41588-026-02641-8](https://doi.org/10.1038/s41588-026-02641-8)
+> Chen S, Liu X, Qu S, Song Y, Chai K, Liu H, Zhang Y, Xia Z, Li X, Wang J, Zhang M, Li H, Chen GB, Maliepaard C, Zhang X. A k-mer-based genome-wide association study approach empowering gene mining in polyploids. *Nature Genetics* 58, 1711–1721 (2026). doi:[10.1038/s41588-026-02641-8](https://doi.org/10.1038/s41588-026-02641-8)
 
 <details>
 <summary>BibTeX</summary>
 
 ```bibtex
 @article{chen2026kmeria,
-  title   = {A k-mer-based GWAS approach empowering gene mining in polyploids},
+  title   = {A k-mer-based genome-wide association study approach empowering gene mining in polyploids},
   author  = {Chen, Shuai and Liu, Xinlong and Qu, Shenyang and Song, Yuhan and Chai, Kun and Liu, Hongbo and Zhang, Yuebin and Xia, Zhongqiang and Li, Xiaofeng and Wang, Jungang and Zhang, Muqing and Li, Hongbo and Chen, Guo Bo and Maliepaard, Chris and Zhang, Xingtan},
   journal = {Nature Genetics},
   volume  = {58},
