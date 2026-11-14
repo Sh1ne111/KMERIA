@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 250" width="1000" height="250" role="img" aria-labelledby="t d">
+  <title id="t">KMERIA workflow</title>
+  <desc id="d">Raw reads go through k-mer counting, matrix construction, filtering, BIMBAM conversion and association testing; significant k-mers are then mapped to the genome and shown in a Manhattan plot.</desc>
+  <style>
+    text{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;fill:#2a2140}
+    .n{font-size:15px;font-weight:700}
+    .s{font-size:12px;fill:#5b5470}
+    .m{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;fill:#6A2BB0}
+    .g{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;fill:#7a6410}
+    .box{fill:#f5f0fb;stroke:#6A2BB0;stroke-width:1.5}
+    .box2{fill:#fbf6e3;stroke:#B8960F;stroke-width:1.5}
+    .arr{stroke:#8a7fa3;stroke-width:1.6;fill:none}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.2px}
+  </style>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9z" fill="#8a7fa3"/></marker></defs>
+  <text x="20" y="26" class="lbl" style="fill:#6A2BB0">KMERIA pipeline</text>
+  <text x="20" y="40" class="s"> </text>
+  <g>
+    <rect class="box" x="20"  y="50" width="120" height="96" rx="10"/><text class="n" x="80"  y="78"  text-anchor="middle">Count</text><text class="m" x="80"  y="98"  text-anchor="middle">--step count</text><text class="s" x="80"  y="120" text-anchor="middle">k-mers per</text><text class="s" x="80"  y="135" text-anchor="middle">sample</text>
+    <rect class="box" x="168" y="50" width="120" height="96" rx="10"/><text class="n" x="228" y="78"  text-anchor="middle">Merge</text><text class="m" x="228" y="98"  text-anchor="middle">--step kctm</text><text class="s" x="228" y="120" text-anchor="middle">k-mer count</text><text class="s" x="228" y="135" text-anchor="middle">matrix</text>
+    <rect class="box" x="316" y="50" width="120" height="96" rx="10"/><text class="n" x="376" y="78"  text-anchor="middle">Filter</text><text class="m" x="376" y="98"  text-anchor="middle">--step filter</text><text class="s" x="376" y="120" text-anchor="middle">drop rare and</text><text class="s" x="376" y="135" text-anchor="middle">noisy k-mers</text>
+    <rect class="box" x="464" y="50" width="120" height="96" rx="10"/><text class="n" x="524" y="78"  text-anchor="middle">Convert</text><text class="m" x="524" y="98"  text-anchor="middle">--step m2b</text><text class="s" x="524" y="120" text-anchor="middle">dosage to</text><text class="s" x="524" y="135" text-anchor="middle">BIMBAM</text>
+    <rect class="box" x="612" y="50" width="120" height="96" rx="10"/><text class="n" x="672" y="78"  text-anchor="middle">Associate</text><text class="m" x="672" y="98"  text-anchor="middle">--step asso</text><text class="s" x="672" y="120" text-anchor="middle">bimbamAsso</text><text class="s" x="672" y="135" text-anchor="middle">or GEMMA</text>
+    <rect class="box2" x="780" y="50" width="200" height="96" rx="10"/><text class="n" x="880" y="78" text-anchor="middle">Post-GWAS</text><text class="g" x="880" y="98" text-anchor="middle">BLAST + plot</text><text class="s" x="880" y="120" text-anchor="middle">locate significant k-mers,</text><text class="s" x="880" y="135" text-anchor="middle">Manhattan plot</text>
+  </g>
+  <g class="arr" marker-end="url(#a)">
+    <path d="M140 98 H164" marker-end="url(#a)"/><path d="M288 98 H312" marker-end="url(#a)"/><path d="M436 98 H460" marker-end="url(#a)"/><path d="M584 98 H608" marker-end="url(#a)"/><path d="M732 98 H776" marker-end="url(#a)"/>
+  </g>
+  <g>
+    <text class="m" x="80"  y="196" text-anchor="middle">01_kmer_counts</text>
+    <text class="m" x="228" y="196" text-anchor="middle">02_kmer_matrices</text>
+    <text class="m" x="376" y="196" text-anchor="middle">03_filtered_matrices</text>
+    <text class="m" x="524" y="196" text-anchor="middle">04_bimbam</text>
+    <text class="m" x="672" y="196" text-anchor="middle">05_association</text>
+    <text class="s" x="880" y="196" text-anchor="middle">significant k-mers, genes</text>
+  </g>
+  <path d="M20 214 H732" stroke="#6A2BB0" stroke-width="3" stroke-linecap="round"/>
+  <path d="M780 214 H980" stroke="#B8960F" stroke-width="3" stroke-linecap="round"/>
+  <text class="s" x="20"  y="236">kmeria_wrapper.pl --step all: generates one job script per step for SLURM, SGE or PBS</text>
+  <text class="s" x="980" y="236" text-anchor="end">see the Wiki</text>
+</svg>
